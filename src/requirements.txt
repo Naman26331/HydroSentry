@@ -1,2 +1,1 @@
-# Phase 3 will add dependencies here if needed.
-# Python 3.12 stdlib is sufficient for the compute engine.
+boto3
