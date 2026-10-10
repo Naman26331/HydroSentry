@@ -209,8 +209,14 @@ def _handle_post_rainfall(body: dict) -> dict:
 def _handle_get_hazards() -> dict:
     scan = dynamodb.scan(
         TableName=TABLE_NAME,
-        FilterExpression="status = :s",
-        ExpressionAttributeValues={":s": {"S": "HAZARD_ACTIVE"}},
+        # "status" is a DynamoDB reserved word -> alias it. Expired items are
+        # filtered here because TTL deletion is lazy (up to ~48 h).
+        FilterExpression="#s = :s AND expires_at > :now",
+        ExpressionAttributeNames={"#s": "status"},
+        ExpressionAttributeValues={
+            ":s":   {"S": "HAZARD_ACTIVE"},
+            ":now": {"N": str(int(time.time()))},
+        },
     )
     hazards = []
     for item in scan.get("Items", []):
