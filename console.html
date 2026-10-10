@@ -9,34 +9,50 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
-:root{--g:#1a73e8;--ok:#188038;--bad:#d93025;--ink:#202124;--sub:#5f6368;--card:#fff;--line:#dadce0}
+:root{--g:#1a73e8;--ok:#188038;--bad:#d93025;--warn:#b06000;--ink:#202124;--sub:#5f6368;--card:#fff;--line:#dadce0;
+  --font:Roboto,"Segoe UI",system-ui,sans-serif;--sh:0 2px 8px rgba(60,64,67,.35)}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;font-family:Roboto,"Segoe UI",system-ui,sans-serif;color:var(--ink)}
+html,body{margin:0;height:100%;font-family:var(--font);color:var(--ink)}
 #map{position:fixed;inset:0;background:#e8eaed}
-.float{position:fixed;z-index:1000;background:var(--card);box-shadow:0 2px 8px rgba(60,64,67,.35)}
+.float{position:fixed;z-index:1000;background:var(--card);box-shadow:var(--sh)}
 #top{position:fixed;z-index:1000;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;display:flex;flex-direction:column;gap:8px;pointer-events:none}
 #top>*{pointer-events:auto}
 .row{display:flex;gap:8px;align-items:center}
-#pill{flex:1;min-width:0;background:var(--card);border-radius:28px;padding:10px 16px;box-shadow:0 2px 8px rgba(60,64,67,.35);
+#pill{flex:1;min-width:0;background:var(--card);border-radius:28px;padding:10px 16px;box-shadow:var(--sh);
   display:flex;align-items:center;gap:10px;font-size:15px;font-weight:500;white-space:nowrap}
 #pill .dot{width:10px;height:10px;border-radius:50%;background:var(--g);flex:none}
 #pill span.t{overflow:hidden;text-overflow:ellipsis}
-#officerBtn{flex:none;border:0;border-radius:22px;padding:11px 14px;background:var(--card);color:var(--g);font:500 13px Roboto,"Segoe UI",system-ui,sans-serif;
-  box-shadow:0 2px 8px rgba(60,64,67,.35);cursor:pointer}
+#officerBtn{flex:none;border:0;border-radius:22px;padding:11px 14px;background:var(--card);color:var(--g);font:500 13px var(--font);
+  box-shadow:var(--sh);cursor:pointer}
 #officerBtn[aria-pressed=true]{background:var(--g);color:#fff}
+/* Vehicle segmented control */
+#veh{display:flex;align-self:flex-start;max-width:100%;overflow-x:auto;scrollbar-width:none;background:var(--card);border-radius:20px;padding:3px;box-shadow:var(--sh)}
+#veh button{border:0;background:none;border-radius:17px;padding:7px 11px;font:500 12.5px var(--font);color:var(--sub);cursor:pointer;white-space:nowrap}
+#veh button[aria-pressed=true]{background:#e8f0fe;color:var(--g)}
 #sims{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;scrollbar-width:none}
 #sims button{flex:none;border:1px solid var(--line);border-radius:18px;padding:8px 14px;background:var(--card);
-  font:500 13px Roboto,"Segoe UI",system-ui,sans-serif;color:var(--ink);cursor:pointer;box-shadow:0 1px 3px rgba(60,64,67,.3)}
+  font:500 13px var(--font);color:var(--ink);cursor:pointer;box-shadow:0 1px 3px rgba(60,64,67,.3)}
 #sims button[aria-pressed=true]{background:#e8f0fe;border-color:var(--g);color:var(--g)}
 button:focus-visible{outline:2px solid var(--g);outline-offset:2px}
-#drawer{left:0;right:0;bottom:0;border-radius:16px 16px 0 0;padding:14px 18px calc(16px + env(safe-area-inset-bottom));
-  transition:transform .3s}
+/* Bottom drawer */
+#drawer{left:0;right:0;bottom:0;border-radius:16px 16px 0 0;padding:14px 18px calc(34px + env(safe-area-inset-bottom))}
 #drawer .handle{width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 10px}
-#status{font-size:20px;font-weight:600;line-height:1.3}
-#status.ok{color:var(--ok)} #status.warn{color:#b06000} #status.bad{color:var(--bad)}
+#status{font-size:19px;font-weight:600;line-height:1.3}
+#status.ok{color:var(--ok)} #status.warn{color:var(--warn)} #status.bad{color:var(--bad)}
 #sub{margin-top:4px;font-size:14px;color:var(--sub)}
-#note{margin-top:8px;font-size:11px;color:var(--sub)}
-#officer{left:0;right:0;bottom:0;max-height:62vh;overflow:auto;border-radius:16px 16px 0 0;padding:14px 16px 24px;
+#gauge{margin-top:10px}
+#gauge .lab{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-bottom:4px}
+#gauge .lab b{color:var(--ink)}
+#gbar{position:relative;height:10px;border-radius:5px;background:#e8eaed;overflow:visible}
+#gfill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:5px;background:#4285f4}
+#gbar .mk{position:absolute;top:-3px;bottom:-3px;width:2px;background:#9aa0a6}
+#gbar .mk.on{background:var(--bad);width:3px}
+#gticks{position:relative;height:14px;font-size:10px;color:var(--sub)}
+#gticks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+#gticks span:last-child{transform:translateX(-100%)}
+#note{margin-top:6px;font-size:11px;color:var(--sub)}
+/* Officer sheet */
+#officer{left:0;right:0;bottom:0;max-height:64vh;overflow:auto;border-radius:16px 16px 0 0;padding:14px 16px 48px;
   transform:translateY(105%);transition:transform .3s;z-index:1100}
 #officer.open{transform:none}
 #officer h2{margin:0 0 10px;font-size:16px}
@@ -44,12 +60,26 @@ button:focus-visible{outline:2px solid var(--g);outline-offset:2px}
 .card b{display:block;font-size:15px}
 .card .meta{font-size:13px;color:var(--sub);margin-top:4px}
 .chip{display:inline-block;margin-top:8px;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600}
-.chip.go{background:#fce8e6;color:var(--bad)} .chip.stby{background:#fef7e0;color:#b06000} .chip.none{background:#e6f4ea;color:var(--ok)}
+.chip.go{background:#fce8e6;color:var(--bad)} .chip.stby{background:#fef7e0;color:var(--warn)} .chip.none{background:#e6f4ea;color:var(--ok)}
+.dispatch{display:block;width:100%;margin-top:10px;border:0;border-radius:10px;padding:11px;background:var(--bad);color:#fff;
+  font:600 14px var(--font);cursor:pointer}
+.dispatch:disabled{background:#f1f3f4;color:#80868b;cursor:not-allowed}
+.hint{font-size:12px;color:var(--sub);margin-top:6px}
+/* SMS toast */
+#toast{position:fixed;z-index:1300;top:max(10px,env(safe-area-inset-top));right:10px;width:min(320px,calc(100vw - 20px));
+  background:#fff;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.28);padding:10px 12px;cursor:pointer;
+  transform:translateY(-140%);opacity:0;transition:transform .35s,opacity .35s}
+#toast.show{transform:none;opacity:1}
+#toast .from{font-size:11px;color:var(--sub);display:flex;justify-content:space-between}
+#toast .msg{font-size:13.5px;line-height:1.35;margin-top:4px}
+/* Cost badge */
+#badge{position:fixed;z-index:1200;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));max-width:calc(100vw - 16px);
+  background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:10.5px;color:var(--sub)}
 .hazard-icon{background:var(--bad);color:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;
   justify-content:center;font-size:16px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
 .lbl{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:11px;font-weight:600;box-shadow:none}
-@media(prefers-reduced-motion:reduce){#drawer,#officer{transition:none}}
 .leaflet-control-zoom{display:none}
+@media(prefers-reduced-motion:reduce){#officer,#toast{transition:none}}
 </style>
 </head>
 <body>
@@ -59,6 +89,11 @@ button:focus-visible{outline:2px solid var(--g);outline-offset:2px}
   <div class="row">
     <div id="pill"><span class="dot"></span><span class="t">Connaught Place ➔ Lajpat Nagar</span></div>
     <button id="officerBtn" aria-pressed="false" aria-controls="officer">Officer View</button>
+  </div>
+  <div id="veh" role="group" aria-label="Vehicle clearance">
+    <button data-v="two" aria-pressed="false">🛵 2-Wheeler (20 cm)</button>
+    <button data-v="car" aria-pressed="true">🚗 Car (35 cm)</button>
+    <button data-v="amb" aria-pressed="false">🚑 Ambulance (50 cm)</button>
   </div>
   <div id="sims" role="group" aria-label="Simulation">
     <button data-s="dry" aria-pressed="true">Dry</button>
@@ -71,6 +106,11 @@ button:focus-visible{outline:2px solid var(--g);outline-offset:2px}
   <div class="handle"></div>
   <div id="status" class="ok">Route Normal • 22 mins</div>
   <div id="sub"></div>
+  <div id="gauge" aria-label="Minto Underpass water depth">
+    <div class="lab"><span>Minto Underpass water depth</span><b id="gval">0 mm</b></div>
+    <div id="gbar"><div id="gfill"></div></div>
+    <div id="gticks"></div>
+  </div>
   <div id="note"></div>
 </div>
 
@@ -78,6 +118,13 @@ button:focus-visible{outline:2px solid var(--g);outline-offset:2px}
   <h2>Pump dispatch</h2>
   <div id="cards"></div>
 </div>
+
+<div id="toast" role="status" aria-live="polite" hidden>
+  <div class="from"><span>📩 SMS via Amazon SNS · simulated</span><span>now</span></div>
+  <div class="msg" id="toastMsg"></div>
+</div>
+
+<div id="badge">☁️ AWS Architecture: Serverless, pay-per-request • Est. Monthly Idle Cost: $0.00</div>
 
 <script>
 "use strict";
@@ -89,29 +136,50 @@ const API_TIMEOUT_MS = 4000;
 
 // ── Seed data (data/delhi_sinks.yaml) ─────────────────────────────────────────
 const SINKS = [
-  {id:"DELSNK001", name:"Minto Underpass",        short:"Minto",   ll:[28.63361,77.21722], area:48500, c:0.92, vol:1850, drain:120},
-  {id:"DELSNK002", name:"Pul Prahladpur Underpass",short:"Prahladpur", ll:[28.49770,77.29470], area:62000, c:0.90, vol:2400, drain:95},
-  {id:"DELSNK003", name:"Zakhira Underpass",      short:"Zakhira", ll:[28.65900,77.16800], area:41200, c:0.88, vol:1620, drain:80},
+  {id:"DELSNK001", name:"Minto Underpass",         ll:[28.63361,77.21722], area:48500, c:0.92, vol:1850, drain:120},
+  {id:"DELSNK002", name:"Pul Prahladpur Underpass", ll:[28.49770,77.29470], area:62000, c:0.90, vol:2400, drain:95},
+  {id:"DELSNK003", name:"Zakhira Underpass",       ll:[28.65900,77.16800], area:41200, c:0.88, vol:1620, drain:80},
 ];
 const SCENARIOS = {dry:0, moderate:15, cloudburst:65};
+
+// Vehicle clearance thresholds (mm). The model caps depth at the 350 mm
+// critical level, so the ambulance threshold is never reached.
+const VEHICLES = {
+  two:{label:"2-wheelers", mm:200},
+  car:{label:"cars",       mm:350},
+  amb:{label:"ambulances", mm:500},
+};
+
+// Phase 1 constants (compute.py defaults)
+const CRIT_DEPTH_MM = 350, HEAD_M = 5.0, HP_DENOM = 270;
+const CEDAR_DEPTH_MM = 350, CEDAR_TTS_MIN = 30;
+const STORM_MIN = 45;                       // replayed storm length (model minutes)
+const REPLAY_MIN_PER_SEC = 5;               // 45 model-min shown in 9 s
+const PUMP_HP = 40;
+const PUMP_M3HR = PUMP_HP * HP_DENOM / HEAD_M;   // 2160 m3/hr at 5 m head
+const DRAIN_TARGET_MM = 190;                // "under 200 mm"
+const DRAIN_ANIM_MS = 3000;
 
 // Illustrative routes (hand-drawn waypoints, NOT turn-by-turn navigation).
 const CP = [28.6315,77.2167], LN = [28.5677,77.2433];
 const MAIN   = [CP, [28.6336,77.2172], [28.6280,77.2290], [28.6139,77.2410], [28.5900,77.2420], LN];
-const BYPASS = [CP, [28.6270,77.2150], [28.6190,77.2270], [28.6139,77.2410], [28.5900,77.2420], LN];
+const BYPASS = [CP, [28.6304,77.2209], [28.6289,77.2254], [28.6258,77.2340], [28.6139,77.2410], [28.5900,77.2420], LN]; // via Barakhamba Rd
 
-// ── Local fallback compute (port of compute.py, Phase 1) ─────────────────────
+// ── Model (port of compute.py, Phase 1) ──────────────────────────────────────
 const h2 = v => Math.floor(v*100+0.5)/100;
+const inflow = (s, rain) => rain/1000*s.area*s.c;
+// Snapshot at the standard 15-min storm, identical to compute.py / the API.
 function localCompute(s, rain){
-  const net = rain/1000*s.area*s.c - s.drain;
+  const net = inflow(s,rain) - s.drain;
   if (net <= 0) return {status:"CLEAR", depth_mm:0, tts_min:null, required_pump_hp:0, cedar_authorization:"DISPATCH_DENIED"};
   const tts = s.vol/net*60, volm = Math.min(s.vol, net*15/60);
-  const depth = Math.floor(volm/s.vol*35.0*10+1e-9), ttsI = Math.floor(tts+1e-9);
-  return {status:"HAZARD_ACTIVE", depth_mm:depth, tts_min:ttsI, required_pump_hp:h2(net*5/270),
-          cedar_authorization:(depth>=350 && ttsI<=30) ? "DISPATCH_AUTHORIZED":"DISPATCH_DENIED"};
+  const depth = Math.floor(volm/s.vol*CRIT_DEPTH_MM+1e-9), ttsI = Math.floor(tts+1e-9);
+  return {status:"HAZARD_ACTIVE", depth_mm:depth, tts_min:ttsI, required_pump_hp:h2(net*HEAD_M/HP_DENOM),
+          cedar_authorization:(depth>=CEDAR_DEPTH_MM && ttsI<=CEDAR_TTS_MIN) ? "DISPATCH_AUTHORIZED":"DISPATCH_DENIED"};
 }
 { const r = localCompute(SINKS[0],65);   // Phase 1 golden
   console.assert(r.depth_mm===131 && r.tts_min===39 && r.required_pump_hp===51.49, "golden mismatch"); }
+const volToMm = (s, v) => Math.floor(Math.max(0,Math.min(s.vol,v))/s.vol*CRIT_DEPTH_MM+1e-9);
 
 async function fetchSink(s, rain){
   const ctl = new AbortController(), t = setTimeout(()=>ctl.abort(), API_TIMEOUT_MS);
@@ -132,82 +200,209 @@ let fellBack = false;
 osm.on("tileerror", ()=>{ if(fellBack) return; fellBack = true; map.removeLayer(osm);
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
     {maxZoom:19, subdomains:"abcd", attribution:"© OpenStreetMap contributors © CARTO"}).addTo(map); });
-map.fitBounds(L.latLngBounds([CP,LN]).pad(0.35));
+map.fitBounds(L.latLngBounds([CP,LN]),{paddingTopLeft:[30,170],paddingBottomRight:[30,250]});
 
 const layer = L.layerGroup().addTo(map);
 const pin = (ll,color)=>L.circleMarker(ll,{radius:7,color:"#fff",weight:3,fillColor:color,fillOpacity:1});
 
-// ── Render ────────────────────────────────────────────────────────────────────
+// ── Simulation state ──────────────────────────────────────────────────────────
+const sim = {
+  scenario:"dry", rain:0, t:0, timer:null,
+  vol:SINKS.map(()=>0),        // accumulated m3 per sink
+  pumped:false, draining:false,
+  vehicle:"car",
+  api:null, mode:"local",
+  wasRerouted:false,
+};
 const $ = id => document.getElementById(id);
-function classify(r){            // layman level for one sink
-  if(r.status!=="HAZARD_ACTIVE") return "clear";
-  if(r.cedar_authorization==="DISPATCH_AUTHORIZED" || r.depth_mm>=350 || (r.tts_min!==null && r.tts_min<=45)) return "danger";
-  return "watch";
-}
-function render(results, mode){
-  layer.clearLayers();
-  const lv = results.map(classify);
-  const minto = lv[0];
-  const reroute = minto==="danger";
+const rainNow = () => sim.t < STORM_MIN ? sim.rain : 0;   // storm passes after 45 model-min
+const depth = i => volToMm(SINKS[i], sim.vol[i]);
+const threshold = () => VEHICLES[sim.vehicle].mm;
 
-  // Main route (greyed when rerouting) + origin/destination pins
+function sinkView(i){
+  const s = SINKS[i], snap = localCompute(s, sim.rain);
+  const d = depth(i), netNow = inflow(s, rainNow()) - s.drain;
+  return {s, d, snap, netNow,
+    blocked: d >= threshold(),
+    // Cedar context mirrors the policy: live depth + time-to-submersion from the snapshot
+    cedarOK: d >= CEDAR_DEPTH_MM && snap.tts_min !== null && snap.tts_min <= CEDAR_TTS_MIN};
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+let mapSig = "";
+function drawMap(views){
+  const reroute = views[0].blocked;
+  const sig = reroute + "|" + views.map(v=>v.blocked).join(",");
+  if (sig === mapSig) return;               // only redraw when something visible changes
+  mapSig = sig;
+  layer.clearLayers();
   L.polyline(MAIN,{color:reroute?"#9aa0a6":"#1a73e8",weight:reroute?5:7,opacity:reroute?.7:1,dashArray:reroute?"2 10":null,lineCap:"round"}).addTo(layer);
   if(reroute) L.polyline(BYPASS,{color:"#188038",weight:7,lineCap:"round"}).addTo(layer);
   pin(CP,"#1a73e8").addTo(layer).bindTooltip("Connaught Place",{permanent:true,direction:"left",className:"lbl"});
   pin(LN,"#d93025").addTo(layer).bindTooltip("Lajpat Nagar",{permanent:true,direction:"bottom",className:"lbl"});
-
-  // Flooded sinks: red zone + hazard icon
-  SINKS.forEach((s,i)=>{
-    if(lv[i]!=="danger") return;
-    L.circle(s.ll,{radius:260,color:"#d93025",weight:2,fillColor:"#d93025",fillOpacity:.35}).addTo(layer);
-    L.marker(s.ll,{icon:L.divIcon({className:"",html:'<div class="hazard-icon">⚠</div>',iconSize:[30,30],iconAnchor:[15,15]})})
-      .addTo(layer).bindTooltip(s.name,{direction:"right",className:"lbl"});
+  views.forEach(v=>{
+    if(!v.blocked) return;
+    L.circle(v.s.ll,{radius:260,color:"#d93025",weight:2,fillColor:"#d93025",fillOpacity:.35}).addTo(layer);
+    L.marker(v.s.ll,{icon:L.divIcon({className:"",html:'<div class="hazard-icon">⚠</div>',iconSize:[30,30],iconAnchor:[15,15]})})
+      .addTo(layer).bindTooltip(v.s.name,{direction:"right",className:"lbl"});
   });
+}
 
-  // Drawer
-  const st=$("status"), sub=$("sub");
-  if(reroute){
+const GAUGE_MAX = 500;
+function buildGauge(){
+  const bar=$("gbar"), ticks=$("gticks");
+  Object.entries(VEHICLES).forEach(([k,v])=>{
+    const m=document.createElement("div"); m.className="mk"; m.dataset.v=k; m.style.left=(v.mm/GAUGE_MAX*100)+"%"; bar.append(m);
+    const t=document.createElement("span"); t.style.left=(v.mm/GAUGE_MAX*100)+"%"; t.textContent=(v.mm/10)+" cm"; ticks.append(t);
+  });
+}
+function drawDrawer(views){
+  const m = views[0], st=$("status"), sub=$("sub"), cm = Math.round(m.d/10);
+  $("gval").textContent = m.d + " mm";
+  $("gfill").style.width = Math.min(100, m.d/GAUGE_MAX*100) + "%";
+  $("gfill").style.background = m.blocked ? "var(--bad)" : (m.d >= VEHICLES.two.mm ? "#f9ab00" : "#4285f4");
+  document.querySelectorAll("#gbar .mk").forEach(e=>e.classList.toggle("on", e.dataset.v===sim.vehicle));
+
+  if (sim.pumped && !m.blocked){
+    st.className="ok"; st.textContent="Pump Unit Active • Minto Bridge Drained • Route Restored to Normal";
+    sub.textContent="Water down to "+m.d+" mm. Usual route reopened: 22 mins.";
+  } else if (m.blocked){
     st.className="bad"; st.textContent="⚠️ Rerouted around Minto Underpass • +4 mins • 100% Dry Road";
-    sub.textContent="Flooding expected on the usual route. New trip: 26 mins.";
+    sub.textContent="Water at "+cm+" cm — too deep for "+VEHICLES[sim.vehicle].label+". New trip: 26 mins via Barakhamba Rd.";
+  } else if (sim.vehicle==="amb" && m.d >= VEHICLES.two.mm){
+    st.className="ok"; st.textContent="Route Normal • 22 mins";
+    sub.textContent="Water at "+cm+" cm — Passable for Heavy/Emergency Vehicles";
   } else {
-    st.className = minto==="watch" ? "warn" : "ok"; st.textContent="Route Normal • 22 mins";
-    sub.textContent = minto==="watch" ? "Light rain — we're keeping an eye on Minto Underpass." : "No flooding on your route.";
+    st.className = m.d>0 ? "warn" : "ok"; st.textContent="Route Normal • 22 mins";
+    sub.textContent = m.d>0 ? "Rain — watching Minto Underpass." : (sim.rain>0 ? "Rain is draining normally." : "No flooding on your route.");
   }
-  $("note").textContent = (mode==="api" ? "Live data from "+API_BASE_URL : "Offline demo (backend not reachable at "+API_BASE_URL+")")
+  const clock = sim.rain>0 ? (sim.t < STORM_MIN ? "Storm replay: minute "+Math.floor(sim.t)+" of "+STORM_MIN : "Storm passed") + " • " : "";
+  $("note").textContent = clock + (sim.mode==="api" ? "Backend live at "+API_BASE_URL : "Offline demo (backend not reachable)")
     + " • Illustrative route, not navigation";
+}
 
-  // Officer cards (textContent only)
-  const box=$("cards"); box.textContent="";
+// Officer cards: built once per scenario, then updated in place.
+let cardRefs = [];
+function buildCards(){
+  const box=$("cards"); box.textContent=""; cardRefs=[];
   SINKS.forEach((s,i)=>{
-    const r=results[i], c=document.createElement("div"); c.className="card";
+    const c=document.createElement("div"); c.className="card";
     const b=document.createElement("b"); b.textContent=s.name;
-    const m=document.createElement("div"); m.className="meta";
+    const meta=document.createElement("div"); meta.className="meta";
     const chip=document.createElement("span"); chip.className="chip";
-    if(r.status!=="HAZARD_ACTIVE"){ m.textContent="Water is draining normally."; chip.classList.add("none"); chip.textContent="No pump needed"; }
-    else {
-      m.textContent="Water "+r.depth_mm+" mm of 350 mm danger level • about "+r.tts_min+" min to danger • pump power ~"+Math.round(r.required_pump_hp)+" HP";
-      if(r.cedar_authorization==="DISPATCH_AUTHORIZED"){ chip.classList.add("go"); chip.textContent="Dispatch pump now"; }
-      else { chip.classList.add("stby"); chip.textContent="Standby — not yet at dispatch level"; }
+    const api=document.createElement("div"); api.className="hint";
+    c.append(b,meta,chip,api);
+    let btn=null, hint=null;
+    if(i===0){
+      btn=document.createElement("button"); btn.className="dispatch"; btn.textContent="🚨 Dispatch "+PUMP_HP+" HP Pump";
+      btn.addEventListener("click", dispatchPump);
+      hint=document.createElement("div"); hint.className="hint";
+      c.append(btn,hint);
     }
-    c.append(b,m,chip); box.append(c);
+    box.append(c); cardRefs.push({meta,chip,api,btn,hint});
   });
+}
+function drawCards(views){
+  views.forEach((v,i)=>{
+    const r=cardRefs[i]; if(!r) return;
+    r.chip.className="chip";
+    if(v.d===0 && v.snap.status!=="HAZARD_ACTIVE"){ r.meta.textContent="Water is draining normally."; r.chip.classList.add("none"); r.chip.textContent="No pump needed"; }
+    else {
+      r.meta.textContent="Water "+v.d+" mm of 350 mm • fills in about "+(v.snap.tts_min ?? "—")+" min • pump power to hold level ~"+Math.ceil(Math.max(0,v.netNow)*HEAD_M/HP_DENOM)+" HP";
+      if(i===0 && sim.pumped){ r.chip.classList.add("none"); r.chip.textContent="Pump unit active"; }
+      else if(v.cedarOK){ r.chip.classList.add("go"); r.chip.textContent="Auto-dispatch approved"; }
+      else { r.chip.classList.add("stby"); r.chip.textContent = v.d>=CEDAR_DEPTH_MM ? "Auto-dispatch denied: fills in "+v.snap.tts_min+" min (> "+CEDAR_TTS_MIN+")" : "Standby — below dispatch level"; }
+    }
+    r.api.textContent = (sim.api && sim.api[i]) ? "Backend 15-min check: "+sim.api[i].cedar_authorization : "";
+    if(r.btn){
+      const removal = PUMP_M3HR + v.s.drain - inflow(v.s, rainNow());
+      const can = !sim.pumped && !sim.draining && v.d >= VEHICLES.two.mm && removal > 0;
+      r.btn.disabled = !can;
+      r.hint.textContent = sim.pumped ? "Pump running." :
+        sim.draining ? "Pumping…" :
+        v.d < VEHICLES.two.mm ? "Manual officer dispatch. Enabled once water reaches 20 cm." :
+        removal <= 0 ? PUMP_HP+" HP moves "+PUMP_M3HR+" m³/hr, less than the "+Math.round(inflow(v.s,rainNow()))+" m³/hr inflow while it rains. Available once the storm passes." :
+        "Manual officer dispatch: "+PUMP_M3HR+" m³/hr at "+HEAD_M+" m head.";
+    }
+  });
+}
+
+function draw(){
+  const views = SINKS.map((_,i)=>sinkView(i));
+  drawMap(views); drawDrawer(views); drawCards(views);
+  const now = views[0].blocked;
+  if (now && !sim.wasRerouted && sim.scenario==="cloudburst") showSms(views[0]);
+  sim.wasRerouted = now;
+}
+
+// ── SMS toast ────────────────────────────────────────────────────────────────
+let toastTimer=null;
+function showSms(v){
+  const t=$("toast");
+  $("toastMsg").textContent = "[HydroSentry Alert] Minto Bridge impassable for "+VEHICLES[sim.vehicle].label+" ("+Math.round(v.d/10)+" cm). Divert via Barakhamba Rd. Valid for 45m.";
+  t.hidden=false; setTimeout(()=>t.classList.add("show"),20);
+  clearTimeout(toastTimer); toastTimer=setTimeout(hideSms,5000);
+}
+function hideSms(){ const t=$("toast"); t.classList.remove("show"); clearTimeout(toastTimer); setTimeout(()=>{ if(!t.classList.contains("show")) t.hidden=true; },400); }
+$("toast").addEventListener("click", hideSms);
+
+// ── Storm replay ─────────────────────────────────────────────────────────────
+const TICK_MS = 100;
+function tick(){
+  const dt = REPLAY_MIN_PER_SEC*TICK_MS/1000;         // model minutes per tick
+  SINKS.forEach((s,i)=>{ sim.vol[i] = Math.max(0, Math.min(s.vol, sim.vol[i] + (inflow(s,rainNow()) - s.drain)*dt/60)); });
+  sim.t += dt;
+  if (sim.t >= STORM_MIN){ sim.t = STORM_MIN; clearInterval(sim.timer); sim.timer=null; }
+  draw();
 }
 
 async function run(name){
   document.querySelectorAll("#sims button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.s===name));
-  const rain=SCENARIOS[name];
-  let results, mode="api";
-  try { results = await Promise.all(SINKS.map(s=>fetchSink(s,rain))); }
-  catch(e){ mode="local"; results = SINKS.map(s=>localCompute(s,rain)); }
-  render(results, mode);
+  clearInterval(sim.timer); sim.timer=null;
+  Object.assign(sim,{scenario:name, rain:SCENARIOS[name], t:0, vol:SINKS.map(()=>0), pumped:false, draining:false, api:null, wasRerouted:false});
+  hideSms(); buildCards(); draw();
+  if (sim.rain>0){
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches){ while(sim.t<STORM_MIN) tick(); }
+    else sim.timer=setInterval(tick, TICK_MS);
+  }
+  try { sim.api = await Promise.all(SINKS.map(s=>fetchSink(s,sim.rain))); sim.mode="api"; }
+  catch(e){ sim.api=null; sim.mode="local"; }
+  if (sim.scenario===name) draw();
 }
+
+// ── Closed-loop recovery ─────────────────────────────────────────────────────
+function dispatchPump(){
+  const s=SINKS[0], removal = PUMP_M3HR + s.drain - inflow(s, rainNow());
+  if (removal<=0 || sim.draining || sim.pumped) return;
+  clearInterval(sim.timer); sim.timer=null;          // freeze the storm clock while pumping
+  sim.draining=true; draw();
+  const v0=sim.vol[0], v1=DRAIN_TARGET_MM/CRIT_DEPTH_MM*s.vol;
+  const modelMin = Math.max(0,(v0-v1))/removal*60;
+  const t0=Date.now(), dur = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : DRAIN_ANIM_MS;
+  (function step(){
+    const f = dur ? Math.min(1,(Date.now()-t0)/dur) : 1;
+    sim.vol[0] = v0 - (v0-v1)*f;
+    if (f>=1){ sim.vol[0]=v1; sim.draining=false; sim.pumped=true; }
+    draw();
+    if (f<1) setTimeout(step, 33);
+    else $("note").textContent = "Pumped "+Math.round(v0-v1)+" m³ in ~"+Math.round(modelMin)+" model-min (shown in 3 s) • "+$("note").textContent;
+  })();
+}
+
+// ── Wiring ───────────────────────────────────────────────────────────────────
 document.querySelectorAll("#sims button").forEach(b=>b.addEventListener("click",()=>run(b.dataset.s)));
+document.querySelectorAll("#veh button").forEach(b=>b.addEventListener("click",()=>{
+  sim.vehicle=b.dataset.v;
+  document.querySelectorAll("#veh button").forEach(x=>x.setAttribute("aria-pressed", x===b));
+  draw();
+}));
 $("officerBtn").addEventListener("click",()=>{
   const open=$("officer").classList.toggle("open");
   $("officerBtn").setAttribute("aria-pressed",open);
   $("officerBtn").textContent = open ? "Close" : "Officer View";
 });
 window.addEventListener("error",e=>console.error("[HydroSentry]",e.message));
+buildGauge();
 run("dry");
 </script>
 </body>
