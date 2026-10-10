@@ -1,0 +1,35 @@
+// ============================================================================
+// HydroSentry — Cedar Entity Schema
+// Defines the authorization model for automated emergency pump dispatch.
+//
+// Entity Types:
+//   Role       — Authorization principal (e.g., AutomatedSentinel)
+//   UrbanSink  — Resource representing a monitored depression sink
+//
+// Actions:
+//   DispatchEmergencyPump — Deploys emergency pumping assets to a sink
+//
+// Context:
+//   water_depth_mm          — Current water depth at sink invert (millimetres)
+//   time_to_submersion_mins — Minutes until the 350 mm axle-drowning threshold
+// ============================================================================
+
+namespace HydroSentry {
+
+    // Principal entity: authorization role for system actors
+    entity Role;
+
+    // Resource entity: a monitored urban depression sink
+    entity UrbanSink;
+
+    // Action: dispatch emergency dewatering pump to a sink
+    action "DispatchEmergencyPump" appliesTo {
+        principal: [Role],
+        resource:  [UrbanSink],
+        context: {
+            water_depth_mm:          Long,
+            time_to_submersion_mins: Long
+        }
+    };
+
+}

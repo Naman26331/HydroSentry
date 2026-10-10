@@ -1,0 +1,229 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  HydroSentry Phase 2 — Serverless infrastructure for real-time
+  urban flood monitoring and automated emergency pump dispatch.
+  Single SAM template, hackathon-grade, AWS Free Tier.
+
+# =========================================================================
+# Parameters
+# =========================================================================
+Parameters:
+  CorsAllowOrigins:
+    Type: CommaDelimitedList
+    Default: "*"
+    Description: >-
+      Allowed CORS origins.  Use "*" alone for open access, or a
+      comma-separated list of specific origins (e.g.
+      "http://localhost:5173,http://localhost:3000").
+      Never mix "*" with specific origins.
+
+  AlertEmail:
+    Type: String
+    Default: ""
+    Description: >-
+      Optional email address for emergency dispatch notifications.
+      Leave empty to skip email subscription.
+
+  AlertHttpsEndpoint:
+    Type: String
+    Default: ""
+    Description: >-
+      Optional HTTPS endpoint for emergency dispatch webhook.
+      Leave empty to skip HTTPS subscription.
+
+  LocalEndpointUrl:
+    Type: String
+    Default: ""
+    Description: >-
+      LocalStack endpoint URL for local development/testing
+      (e.g. http://host.docker.internal:4566).
+      Leave empty for production deployments.
+
+# =========================================================================
+# Conditions
+# =========================================================================
+Conditions:
+  UseLocalEndpoint: !Not [!Equals [!Ref LocalEndpointUrl, ""]]
+  HasAlertEmail:    !Not [!Equals [!Ref AlertEmail, ""]]
+  HasAlertHttps:    !Not [!Equals [!Ref AlertHttpsEndpoint, ""]]
+
+# =========================================================================
+# Resources
+# =========================================================================
+Resources:
+
+  # ── A. DynamoDB — Hazard State Table ────────────────────────────────────
+  HazardStateTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: HydroSentry-HazardState
+      AttributeDefinitions:
+        - AttributeName: sink_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: sink_id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: expires_at
+        Enabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+
+  # ── B. HTTP API Gateway ─────────────────────────────────────────────────
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      CorsConfiguration:
+        AllowOrigins: !Ref CorsAllowOrigins
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+        AllowCredentials: false
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 20
+        ThrottlingRateLimit: 10
+
+  # ── C. Compute Lambda ──────────────────────────────────────────────────
+
+  ComputeFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/HydroSentry-Compute
+      RetentionInDays: 7
+
+  ComputeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: HydroSentry-Compute
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - arm64
+      MemorySize: 128
+      Timeout: 10
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref HazardStateTable
+          EVENT_BUS_NAME: !Ref HydroSentryBus
+          AWS_ENDPOINT_URL: !If
+            - UseLocalEndpoint
+            - !Ref LocalEndpointUrl
+            - !Ref "AWS::NoValue"
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:GetItem
+                - dynamodb:Scan
+              Resource: !GetAtt HazardStateTable.Arn
+        - EventBridgePutEventsPolicy:
+            EventBusName: !Ref HydroSentryBus
+      LoggingConfig:
+        LogGroup: !Ref ComputeFunctionLogGroup
+      Events:
+        PostTelemetry:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /telemetry/rainfall
+            Method: POST
+        GetHazards:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /hazards/active
+            Method: GET
+
+  # ── D. EventBridge — Emergency Dispatch ────────────────────────────────
+
+  HydroSentryBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: HydroSentry-Bus
+
+  EmergencyDispatchRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: EmergencyDispatchRule
+      EventBusName: !Ref HydroSentryBus
+      EventPattern:
+        source:
+          - hydrosentry.engine
+        detail-type:
+          - EmergencyDispatchAuthorized
+      Targets:
+        - Arn: !Ref EmergencyAlertsTopic
+          Id: SNSTarget
+
+  # ── E. SNS — Emergency Alerts ──────────────────────────────────────────
+
+  EmergencyAlertsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: HydroSentry-EmergencyAlerts
+      DisplayName: HydroSentry Municipal Dispatch
+
+  EmergencyAlertsTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref EmergencyAlertsTopic
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sns:Publish
+            Resource: !Ref EmergencyAlertsTopic
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !GetAtt EmergencyDispatchRule.Arn
+
+  AlertEmailSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: HasAlertEmail
+    Properties:
+      TopicArn: !Ref EmergencyAlertsTopic
+      Protocol: email
+      Endpoint: !Ref AlertEmail
+
+  AlertHttpsSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: HasAlertHttps
+    Properties:
+      TopicArn: !Ref EmergencyAlertsTopic
+      Protocol: https
+      Endpoint: !Ref AlertHttpsEndpoint
+
+# =========================================================================
+# Outputs
+# =========================================================================
+Outputs:
+  ApiUrl:
+    Description: HTTP API endpoint URL
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+
+  TableName:
+    Description: DynamoDB hazard state table name
+    Value: !Ref HazardStateTable
+
+  EventBusName:
+    Description: EventBridge bus name
+    Value: !Ref HydroSentryBus
+
+  TopicArn:
+    Description: SNS emergency alerts topic ARN
+    Value: !Ref EmergencyAlertsTopic
+
+  FunctionName:
+    Description: Compute Lambda function name
+    Value: !Ref ComputeFunction

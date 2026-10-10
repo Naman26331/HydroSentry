@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hydrosentry.dev/schemas/sink.schema.json",
+  "title": "HydroSentry Topographical Sink",
+  "description": "Structural schema for an urban depression sink derived from the 30-metre Copernicus Digital Elevation Model. All elevations and volumes use SI units (metres, cubic metres). Geohash zones are validated to the Delhi geographic prefix 'ttn'.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sink_id",
+    "name",
+    "coordinates",
+    "geohash_zone",
+    "invert_elevation_m",
+    "catchment_area_sq_m",
+    "runoff_coefficient",
+    "critical_volume_capacity_m3",
+    "baseline_drainage_rate_m3_per_hr"
+  ],
+  "properties": {
+    "sink_id": {
+      "type": "string",
+      "description": "Unique alphanumeric identifier for this sink.",
+      "pattern": "^[A-Za-z0-9]+$",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable location name.",
+      "minLength": 1
+    },
+    "coordinates": {
+      "type": "object",
+      "description": "WGS-84 geographic coordinates of the sink invert point.",
+      "additionalProperties": false,
+      "required": ["latitude", "longitude"],
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "description": "Decimal degrees North. MUST be specified with a minimum of 5 decimal places of precision (convention-enforced; multipleOf omitted to avoid IEEE-754 rounding errors).",
+          "minimum": -90.0,
+          "maximum": 90.0
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Decimal degrees East. MUST be specified with a minimum of 5 decimal places of precision (convention-enforced; multipleOf omitted to avoid IEEE-754 rounding errors).",
+          "minimum": -180.0,
+          "maximum": 180.0
+        }
+      }
+    },
+    "geohash_zone": {
+      "type": "string",
+      "description": "Precision-6 geohash string. Must begin with the Delhi geographic prefix 'ttn'.",
+      "pattern": "^ttn[0-9b-hjkmnp-z]{3}$",
+      "minLength": 6,
+      "maxLength": 6
+    },
+    "invert_elevation_m": {
+      "type": "number",
+      "description": "Minimum basin bed elevation relative to EGM2008 sea level, in metres. Sourced from the Copernicus 30 m DEM."
+    },
+    "catchment_area_sq_m": {
+      "type": "number",
+      "description": "Surface area in square metres that funnels rainwater toward this sink.",
+      "exclusiveMinimum": 0
+    },
+    "runoff_coefficient": {
+      "type": "number",
+      "description": "Dimensionless rational method runoff coefficient reflecting impervious urban concrete/asphalt surfaces.",
+      "minimum": 0.85,
+      "maximum": 0.95
+    },
+    "critical_volume_capacity_m3": {
+      "type": "number",
+      "description": "Volumetric water capacity in cubic metres prior to the 350 mm (35 cm) axle-drowning threshold.",
+      "exclusiveMinimum": 0
+    },
+    "baseline_drainage_rate_m3_per_hr": {
+      "type": "number",
+      "description": "Continuous gravity-fed culvert clearance rate in cubic metres per hour under normal conditions.",
+      "exclusiveMinimum": 0
+    }
+  }
+}

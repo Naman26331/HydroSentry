@@ -1,0 +1,62 @@
+# ============================================================================
+# HydroSentry — Delhi Metro Seed Dataset
+# Source DEM: Copernicus GLO-30 (30 m resolution)
+# Coordinate Reference System: WGS-84 (EPSG:4326)
+# Geohash precision: 6 characters (≈1.2 km × 0.6 km cell)
+# All values in SI units
+# ============================================================================
+
+sinks:
+  # -----------------------------------------------------------------------
+  # 1. Minto Bridge Underpass (Shivaji Bridge)
+  #    Historic waterlogging hotspot connecting Connaught Place to
+  #    Ajmeri Gate / New Delhi Railway Station.
+  #    Lowest-lying rail underpass on the Central Delhi ridge drainage.
+  # -----------------------------------------------------------------------
+  - sink_id: "DELSNK001"
+    name: "Minto Bridge Underpass"
+    coordinates:
+      latitude: 28.63361
+      longitude: 77.21722
+    geohash_zone: "ttnfvh"
+    invert_elevation_m: 210.40
+    catchment_area_sq_m: 48500.0
+    runoff_coefficient: 0.92
+    critical_volume_capacity_m3: 1850.0
+    baseline_drainage_rate_m3_per_hr: 120.0
+
+  # -----------------------------------------------------------------------
+  # 2. Pul Prahladpur Underpass
+  #    South-East Delhi rail underpass on the Mathura Road corridor.
+  #    Receives concentrated runoff from the Badarpur–Prahladpur
+  #    catchment via an undersized culvert network.
+  # -----------------------------------------------------------------------
+  - sink_id: "DELSNK002"
+    name: "Pul Prahladpur Underpass"
+    coordinates:
+      latitude: 28.49770
+      longitude: 77.29470
+    geohash_zone: "ttnfng"
+    invert_elevation_m: 203.15
+    catchment_area_sq_m: 62000.0
+    runoff_coefficient: 0.90
+    critical_volume_capacity_m3: 2400.0
+    baseline_drainage_rate_m3_per_hr: 95.0
+
+  # -----------------------------------------------------------------------
+  # 3. Zakhira Underpass
+  #    West Delhi underpass beneath the Zakhira Flyover on New Rohtak
+  #    Road. Drains toward Najafgarh Drain; historically one of the
+  #    first locations to flood during monsoon cloudburst events.
+  # -----------------------------------------------------------------------
+  - sink_id: "DELSNK003"
+    name: "Zakhira Underpass"
+    coordinates:
+      latitude: 28.65900
+      longitude: 77.16800
+    geohash_zone: "ttngh1"
+    invert_elevation_m: 213.80
+    catchment_area_sq_m: 41200.0
+    runoff_coefficient: 0.88
+    critical_volume_capacity_m3: 1620.0
+    baseline_drainage_rate_m3_per_hr: 80.0
