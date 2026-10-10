@@ -1,957 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HydroSentry — Operations Console</title>
-<meta name="description" content="Real-time urban flood monitoring and automated emergency pump dispatch for Delhi NCT underpasses.">
-
-<!-- Leaflet 1.9.4 — pinned, SRI, crossorigin -->
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-  crossorigin="anonymous"
-/>
-<script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WPeE="
-  crossorigin="anonymous"
-></script>
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HydroSentry</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
-/* ── Reset & Tokens ─────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg-deep:    #0a0e14;
-  --bg-panel:   #111820;
-  --bg-card:    #161e2a;
-  --bg-card2:   #1a2435;
-  --border:     #243044;
-  --text:       #c9d6e8;
-  --text-dim:   #64748b;
-  --text-bright:#e8f0fe;
-  --accent:     #3b82f6;
-  --green:      #22c55e;
-  --yellow:     #eab308;
-  --orange:     #f97316;
-  --red:        #ef4444;
-  --red-dim:    #7f1d1d;
-  --font:       'Inter', system-ui, sans-serif;
-  --radius:     6px;
-  --transition: 180ms ease;
-}
-
-html, body { height: 100%; font-family: var(--font); background: var(--bg-deep); color: var(--text); font-size: 14px; overflow: hidden; }
-
-/* ── Layout ─────────────────────────────────────────────────── */
-#shell {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  grid-template-rows: 48px 1fr;
-  height: 100vh;
-  overflow: hidden;
-}
-
-#topbar {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 16px;
-  background: var(--bg-panel);
-  border-bottom: 1px solid var(--border);
-  z-index: 1000;
-}
-
-#map-wrap { min-height: 0; position: relative; }
-#map      { width: 100%; height: 100%; }
-
-#console-panel {
-  min-height: 0;
-  background: var(--bg-panel);
-  border-left: 1px solid var(--border);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-@media (max-width: 900px) {
-  #shell {
-    grid-template-columns: 1fr;
-    grid-template-rows: 48px 55vh 1fr;
-    overflow-y: auto;
-  }
-  #map-wrap { min-height: 0; }
-  #console-panel { min-height: 300px; }
-}
-
-/* ── Topbar ─────────────────────────────────────────────────── */
-#logo {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-bright);
-  letter-spacing: .03em;
-  white-space: nowrap;
-}
-#logo span { color: var(--accent); }
-
-#mode-badge {
-  margin-left: 4px;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  border: 1px solid;
-}
-.badge-sim  { color: #fbbf24; border-color: #fbbf24; background: #451a03; }
-.badge-live { color: #34d399; border-color: #34d399; background: #022c22; }
-
-#tile-notice {
-  display: none;
-  margin-left: auto;
-  font-size: 11px;
-  color: var(--yellow);
-  background: #1c1500;
-  border: 1px solid var(--yellow);
-  border-radius: 4px;
-  padding: 2px 8px;
-}
-
-.ctrl-group { display: flex; gap: 6px; margin-left: auto; }
-
-button.ctrl {
-  padding: 5px 13px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background var(--transition), border-color var(--transition), color var(--transition);
-  white-space: nowrap;
-}
-button.ctrl:hover                { background: var(--bg-card2); border-color: var(--accent); }
-button.ctrl[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-/* ── Console sections ───────────────────────────────────────── */
-.section-hdr {
-  padding: 10px 14px 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-panel);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-/* ── Queue Table ────────────────────────────────────────────── */
-#queue-section { flex-shrink: 0; }
-
-#queue-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
-#queue-table th {
-  text-align: left;
-  padding: 6px 10px;
-  color: var(--text-dim);
-  font-weight: 600;
-  font-size: 11px;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-#queue-table td {
-  padding: 7px 10px;
-  border-bottom: 1px solid #1a2435;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-#queue-table tr:last-child td { border-bottom: none; }
-#queue-body tr { transition: background var(--transition); }
-#queue-body tr:hover { background: var(--bg-card); }
-
-#queue-empty {
-  padding: 14px 10px;
-  color: var(--text-dim);
-  font-size: 12px;
-  font-style: italic;
-  text-align: center;
-}
-
-/* ── Metric Cards ───────────────────────────────────────────── */
-#cards-section { flex-shrink: 0; }
-#cards-wrap { display: flex; flex-direction: column; gap: 0; }
-
-.sink-card {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.sink-card:last-child { border-bottom: none; }
-
-.card-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-bright);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.card-id {
-  font-size: 10px;
-  color: var(--text-dim);
-  font-weight: 400;
-  font-family: monospace;
-}
-
-.state-badge {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .05em;
-  padding: 2px 7px;
-  border-radius: 3px;
-  margin-left: auto;
-}
-.st-clear     { background: #162032; color: var(--text-dim); }
-.st-watch     { background: #1c1a00; color: var(--yellow); }
-.st-imminent  { background: #2a0f0f; color: var(--red); }
-.st-inundated { background: #1a0000; color: #ff4444; }
-
-.metrics-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-.metric {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  padding: 7px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.metric-lbl { font-size: 10px; color: var(--text-dim); }
-.metric-val { font-size: 14px; font-weight: 700; color: var(--text-bright); font-variant-numeric: tabular-nums; }
-.metric-val.warn  { color: var(--yellow); }
-.metric-val.crit  { color: var(--red);    }
-.metric-val.ok    { color: var(--green);  }
-
-.cedar-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-}
-.cedar-lbl { color: var(--text-dim); }
-.cedar-auth { color: var(--green); font-weight: 700; }
-.cedar-deny { color: var(--text-dim); }
-
-/* ── Event Payload ──────────────────────────────────────────── */
-#event-section { flex: 1; }
-
-#event-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-  font-size: 11px;
-}
-#event-status-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--text-dim);
-  flex-shrink: 0;
-}
-#event-status-dot.active { background: var(--red); }
-#event-status-label { font-weight: 600; color: var(--text); }
-#event-timestamp { font-size: 10px; color: var(--text-dim); margin-left: auto; font-family: monospace; }
-
-#event-payload {
-  margin: 10px 14px;
-  background: var(--bg-deep);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 10px;
-  font-family: monospace;
-  font-size: 11px;
-  color: #7dd3fc;
-  white-space: pre;
-  overflow-x: auto;
-  min-height: 100px;
-}
-
-/* ── Status dots in queue ───────────────────────────────────── */
-.dot {
-  display: inline-block;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  margin-right: 5px;
-  flex-shrink: 0;
-}
-.dot-clear    { background: var(--text-dim); }
-.dot-watch    { background: var(--yellow);   }
-.dot-imminent { background: var(--red);      }
-.dot-inundated{ background: #ff4444;         }
-
-/* ── Map markers / overlays ─────────────────────────────────── */
-.divicon-ring {
-  width: 28px !important;
-  height: 28px !important;
-  border-radius: 50%;
-  border: 3px solid var(--red);
-  background: rgba(239,68,68,.18);
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .divicon-ring { animation: pulse 1.4s ease-in-out infinite; }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1);   opacity: 1;   }
-    50%       { transform: scale(1.5); opacity: 0.5; }
-  }
-}
-
-.map-label {
-  background: rgba(10,14,20,.82);
-  color: #e8f0fe;
-  border: 1px solid #243044;
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 11px;
-  font-weight: 600;
-  font-family: system-ui, sans-serif;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.leaflet-control-attribution a { color: #64748b; }
-
-/* ── Scrollbar ──────────────────────────────────────────────── */
-#console-panel::-webkit-scrollbar { width: 4px; }
-#console-panel::-webkit-scrollbar-track { background: transparent; }
-#console-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+:root{--g:#1a73e8;--ok:#188038;--bad:#d93025;--ink:#202124;--sub:#5f6368;--card:#fff;--line:#dadce0}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:Roboto,"Segoe UI",system-ui,sans-serif;color:var(--ink)}
+#map{position:fixed;inset:0;background:#e8eaed}
+.float{position:fixed;z-index:1000;background:var(--card);box-shadow:0 2px 8px rgba(60,64,67,.35)}
+#top{position:fixed;z-index:1000;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+#top>*{pointer-events:auto}
+.row{display:flex;gap:8px;align-items:center}
+#pill{flex:1;min-width:0;background:var(--card);border-radius:28px;padding:10px 16px;box-shadow:0 2px 8px rgba(60,64,67,.35);
+  display:flex;align-items:center;gap:10px;font-size:15px;font-weight:500;white-space:nowrap}
+#pill .dot{width:10px;height:10px;border-radius:50%;background:var(--g);flex:none}
+#pill span.t{overflow:hidden;text-overflow:ellipsis}
+#officerBtn{flex:none;border:0;border-radius:22px;padding:11px 14px;background:var(--card);color:var(--g);font:500 13px Roboto,"Segoe UI",system-ui,sans-serif;
+  box-shadow:0 2px 8px rgba(60,64,67,.35);cursor:pointer}
+#officerBtn[aria-pressed=true]{background:var(--g);color:#fff}
+#sims{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;scrollbar-width:none}
+#sims button{flex:none;border:1px solid var(--line);border-radius:18px;padding:8px 14px;background:var(--card);
+  font:500 13px Roboto,"Segoe UI",system-ui,sans-serif;color:var(--ink);cursor:pointer;box-shadow:0 1px 3px rgba(60,64,67,.3)}
+#sims button[aria-pressed=true]{background:#e8f0fe;border-color:var(--g);color:var(--g)}
+button:focus-visible{outline:2px solid var(--g);outline-offset:2px}
+#drawer{left:0;right:0;bottom:0;border-radius:16px 16px 0 0;padding:14px 18px calc(16px + env(safe-area-inset-bottom));
+  transition:transform .3s}
+#drawer .handle{width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 10px}
+#status{font-size:20px;font-weight:600;line-height:1.3}
+#status.ok{color:var(--ok)} #status.warn{color:#b06000} #status.bad{color:var(--bad)}
+#sub{margin-top:4px;font-size:14px;color:var(--sub)}
+#note{margin-top:8px;font-size:11px;color:var(--sub)}
+#officer{left:0;right:0;bottom:0;max-height:62vh;overflow:auto;border-radius:16px 16px 0 0;padding:14px 16px 24px;
+  transform:translateY(105%);transition:transform .3s;z-index:1100}
+#officer.open{transform:none}
+#officer h2{margin:0 0 10px;font-size:16px}
+.card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.card b{display:block;font-size:15px}
+.card .meta{font-size:13px;color:var(--sub);margin-top:4px}
+.chip{display:inline-block;margin-top:8px;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600}
+.chip.go{background:#fce8e6;color:var(--bad)} .chip.stby{background:#fef7e0;color:#b06000} .chip.none{background:#e6f4ea;color:var(--ok)}
+.hazard-icon{background:var(--bad);color:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;
+  justify-content:center;font-size:16px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.lbl{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:11px;font-weight:600;box-shadow:none}
+@media(prefers-reduced-motion:reduce){#drawer,#officer{transition:none}}
+.leaflet-control-zoom{display:none}
 </style>
 </head>
 <body>
-<div id="shell">
+<div id="map" role="application" aria-label="Map of New Delhi"></div>
 
-  <!-- ── Topbar ── -->
-  <header id="topbar">
-    <div id="logo">Hydro<span>Sentry</span></div>
-    <div id="mode-badge" class="badge-sim">SIMULATED – CEDAR MOCK</div>
-    <div id="tile-notice">Tile fallback active</div>
-
-    <div class="ctrl-group" role="group" aria-label="Scenario controls">
-      <button class="ctrl" id="btn-dry"        aria-pressed="true"  data-scenario="dry">
-        1 &nbsp;Dry / Baseline
-      </button>
-      <button class="ctrl" id="btn-moderate"   aria-pressed="false" data-scenario="moderate">
-        2 &nbsp;Moderate 15 mm/hr
-      </button>
-      <button class="ctrl" id="btn-cloudburst" aria-pressed="false" data-scenario="cloudburst">
-        3 &nbsp;Cloudburst 65 mm/hr
-      </button>
-    </div>
-  </header>
-
-  <!-- ── Map ── -->
-  <div id="map-wrap">
-    <div id="map" role="application" aria-label="Delhi flood monitoring map"></div>
+<div id="top">
+  <div class="row">
+    <div id="pill"><span class="dot"></span><span class="t">Connaught Place ➔ Lajpat Nagar</span></div>
+    <button id="officerBtn" aria-pressed="false" aria-controls="officer">Officer View</button>
   </div>
+  <div id="sims" role="group" aria-label="Simulation">
+    <button data-s="dry" aria-pressed="true">Dry</button>
+    <button data-s="moderate" aria-pressed="false">Moderate Rain</button>
+    <button data-s="cloudburst" aria-pressed="false">Cloudburst (65 mm/hr)</button>
+  </div>
+</div>
 
-  <!-- ── Console Panel ── -->
-  <aside id="console-panel" aria-label="Operations console">
+<div id="drawer" class="float" aria-live="polite">
+  <div class="handle"></div>
+  <div id="status" class="ok">Route Normal • 22 mins</div>
+  <div id="sub"></div>
+  <div id="note"></div>
+</div>
 
-    <!-- Dispatch Queue -->
-    <div id="queue-section">
-      <div class="section-hdr">Emergency Dispatch Queue</div>
-      <table id="queue-table" role="table">
-        <thead>
-          <tr>
-            <th>Sink</th>
-            <th>TTS (min)</th>
-            <th>Depth (mm)</th>
-            <th>Cedar</th>
-          </tr>
-        </thead>
-        <tbody id="queue-body" aria-live="polite" aria-atomic="true">
-          <tr><td colspan="4" id="queue-empty">No active hazards</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Metric Cards -->
-    <div id="cards-section">
-      <div class="section-hdr">Sink Metrics</div>
-      <div id="cards-wrap"></div>
-    </div>
-
-    <!-- Event Payload -->
-    <div id="event-section">
-      <div class="section-hdr">EventBridge Dispatch Preview</div>
-      <div id="event-badge">
-        <div id="event-status-dot"></div>
-        <span id="event-status-label">No dispatch authorized</span>
-        <span id="event-timestamp"></span>
-      </div>
-      <pre id="event-payload" aria-label="Event payload JSON">(no dispatch authorized)</pre>
-    </div>
-
-  </aside>
-</div><!-- /#shell -->
+<div id="officer" class="float" role="region" aria-label="Pump dispatch cards">
+  <h2>Pump dispatch</h2>
+  <div id="cards"></div>
+</div>
 
 <script>
 "use strict";
-// ============================================================================
-// HydroSentry Phase 3 — Operations Console
-// All arithmetic uses integer-scaled fixed-point (×1000000) for half-up round.
-// Phase 1 formulas ported exactly; same Cedar mock thresholds.
-// ============================================================================
+// ── Configuration ─────────────────────────────────────────────────────────────
+// Backend base URL. Local: `sam local start-api` (default). Cloud: paste your
+// API Gateway URL (same value as API_GATEWAY_URL in .env), no trailing slash.
+const API_BASE_URL = "http://127.0.0.1:3000";
+const API_TIMEOUT_MS = 4000;
 
-// ── Fixed clock (injected) ──────────────────────────────────────────────────
-const FIXED_CLOCK = "2026-10-10T10:00:00Z";
-
-// ── Phase 0 Sink Data (from data/delhi_sinks.yaml) ─────────────────────────
+// ── Seed data (data/delhi_sinks.yaml) ─────────────────────────────────────────
 const SINKS = [
-  {
-    id:   "DELSNK001",
-    name: "Minto Bridge Underpass",
-    lat:  28.63361,
-    lng:  77.21722,
-    geohash: "ttnfvh",
-    profile: {
-      catchment_area_m2:           48500,
-      runoff_coeff_ppm:            920000,   // 0.920000 × 1e6
-      baseline_drainage_m3hr_ppm:  120000000,// 120.0 × 1e6
-      critical_volume_m3_ppm:      1850000000,// 1850.0 × 1e6
-      critical_depth_cm_ppm:       35000000, // 35.0 × 1e6
-    },
-    // Corridor: approximate road polygon around Minto Bridge underpass
-    corridorPolygon: [
-      [28.6350, 77.2155], [28.6345, 77.2195],
-      [28.6325, 77.2192], [28.6328, 77.2152]
-    ],
-    // Detour: Alternate route via Connaught Place ring road
-    detour: [
-      [28.6350, 77.2155], [28.6360, 77.2140],
-      [28.6370, 77.2100], [28.6345, 77.2080],
-      [28.6330, 77.2090], [28.6325, 77.2192]
-    ],
-  },
-  {
-    id:   "DELSNK002",
-    name: "Pul Prahladpur Underpass",
-    lat:  28.49770,
-    lng:  77.29470,
-    geohash: "ttnfng",
-    profile: {
-      catchment_area_m2:           62000,
-      runoff_coeff_ppm:            900000,
-      baseline_drainage_m3hr_ppm:  95000000,
-      critical_volume_m3_ppm:      2400000000,
-      critical_depth_cm_ppm:       35000000,
-    },
-    corridorPolygon: [
-      [28.4990, 77.2930], [28.4985, 77.2965],
-      [28.4965, 77.2962], [28.4968, 77.2928]
-    ],
-    detour: [
-      [28.4990, 77.2930], [28.5010, 77.2910],
-      [28.5000, 77.2880], [28.4970, 77.2875],
-      [28.4962, 77.2900], [28.4965, 77.2962]
-    ],
-  },
-  {
-    id:   "DELSNK003",
-    name: "Zakhira Underpass",
-    lat:  28.65900,
-    lng:  77.16800,
-    geohash: "ttngh1",
-    profile: {
-      catchment_area_m2:           41200,
-      runoff_coeff_ppm:            880000,
-      baseline_drainage_m3hr_ppm:  80000000,
-      critical_volume_m3_ppm:      1620000000,
-      critical_depth_cm_ppm:       35000000,
-    },
-    corridorPolygon: [
-      [28.6605, 77.1665], [28.6600, 77.1698],
-      [28.6578, 77.1695], [28.6580, 77.1663]
-    ],
-    detour: [
-      [28.6605, 77.1665], [28.6620, 77.1645],
-      [28.6615, 77.1615], [28.6590, 77.1610],
-      [28.6578, 77.1640], [28.6578, 77.1695]
-    ],
-  },
+  {id:"DELSNK001", name:"Minto Underpass",        short:"Minto",   ll:[28.63361,77.21722], area:48500, c:0.92, vol:1850, drain:120},
+  {id:"DELSNK002", name:"Pul Prahladpur Underpass",short:"Prahladpur", ll:[28.49770,77.29470], area:62000, c:0.90, vol:2400, drain:95},
+  {id:"DELSNK003", name:"Zakhira Underpass",      short:"Zakhira", ll:[28.65900,77.16800], area:41200, c:0.88, vol:1620, drain:80},
 ];
+const SCENARIOS = {dry:0, moderate:15, cloudburst:65};
 
-// ── API Base ────────────────────────────────────────────────────────────────
-const API_BASE = "";  // "" = local deterministic simulation
+// Illustrative routes (hand-drawn waypoints, NOT turn-by-turn navigation).
+const CP = [28.6315,77.2167], LN = [28.5677,77.2433];
+const MAIN   = [CP, [28.6336,77.2172], [28.6280,77.2290], [28.6139,77.2410], [28.5900,77.2420], LN];
+const BYPASS = [CP, [28.6270,77.2150], [28.6190,77.2270], [28.6139,77.2410], [28.5900,77.2420], LN];
 
-// ── Phase 1 Compute (integer-scaled half-up rounding) ───────────────────────
-// All ppm values are ×1e6. We work in integer-scaled milliunits to avoid float.
-// Final display values are rounded to 2 dp (half-up).
-const SCALE = 1000000;
-const HEAD_PPM   = 5 * SCALE;   // 5.0 m
-const EFF_PPM    = 1 * SCALE;   // 1.0
-const DUR_MIN    = 15;
-const HP_DENOM   = 270;
-const DEPTH_THR  = 350;         // Cedar: depth_mm >= 350
-const TTS_THR    = 30;          // Cedar: tts_min <= 30
+// ── Local fallback compute (port of compute.py, Phase 1) ─────────────────────
+const h2 = v => Math.floor(v*100+0.5)/100;
+function localCompute(s, rain){
+  const net = rain/1000*s.area*s.c - s.drain;
+  if (net <= 0) return {status:"CLEAR", depth_mm:0, tts_min:null, required_pump_hp:0, cedar_authorization:"DISPATCH_DENIED"};
+  const tts = s.vol/net*60, volm = Math.min(s.vol, net*15/60);
+  const depth = Math.floor(volm/s.vol*35.0*10+1e-9), ttsI = Math.floor(tts+1e-9);
+  return {status:"HAZARD_ACTIVE", depth_mm:depth, tts_min:ttsI, required_pump_hp:h2(net*5/270),
+          cedar_authorization:(depth>=350 && ttsI<=30) ? "DISPATCH_AUTHORIZED":"DISPATCH_DENIED"};
+}
+{ const r = localCompute(SINKS[0],65);   // Phase 1 golden
+  console.assert(r.depth_mm===131 && r.tts_min===39 && r.required_pump_hp===51.49, "golden mismatch"); }
 
-// Visual state thresholds (UI display, independent of Cedar)
-const TTS_IMMINENT = 45;  // tts_floor <= 45 min → IMMINENT
-const TTS_WATCH    = 120; // tts_floor <= 120 min → WATCH
-
-function halfUp2dp(floatVal) {
-  // Emulates ROUND_HALF_UP to 2 decimal places
-  return Math.floor(floatVal * 100 + 0.5) / 100;
+async function fetchSink(s, rain){
+  const ctl = new AbortController(), t = setTimeout(()=>ctl.abort(), API_TIMEOUT_MS);
+  try{
+    const res = await fetch(API_BASE_URL + "/telemetry/rainfall", {method:"POST", signal:ctl.signal,
+      headers:{"Content-Type":"application/json"}, body:JSON.stringify({sink_id:s.id, rainfall_mm_hr:rain})});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    return await res.json();
+  } finally { clearTimeout(t); }
 }
 
-function computeHazard(sink, rainfallMmHr) {
-  const p = sink.profile;
-  // inflow = rain/1000 * area * coeff  (in m³/hr)
-  // Use floating point but apply half-up rounding only at output — mirrors Decimal behavior
-  const inflow = (rainfallMmHr / 1000) * p.catchment_area_m2 * (p.runoff_coeff_ppm / SCALE);
-  const drain  = p.baseline_drainage_m3hr_ppm / SCALE;
-  const cap    = p.critical_volume_m3_ppm / SCALE;
-  const depCm  = p.critical_depth_cm_ppm / SCALE;
-  const net    = inflow - drain;
+// ── Map ───────────────────────────────────────────────────────────────────────
+const map = L.map("map",{zoomControl:false,attributionControl:true}).setView([28.60,77.23],12);
+// Keyless open tiles: OpenStreetMap (primary). CARTO Positron is the fallback if OSM tiles fail.
+const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {maxZoom:19, attribution:"© OpenStreetMap contributors"}).addTo(map);
+let fellBack = false;
+osm.on("tileerror", ()=>{ if(fellBack) return; fellBack = true; map.removeLayer(osm);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    {maxZoom:19, subdomains:"abcd", attribution:"© OpenStreetMap contributors © CARTO"}).addTo(map); });
+map.fitBounds(L.latLngBounds([CP,LN]).pad(0.35));
 
-  if (net <= 0) {
-    return {
-      active: false,
-      tts_min: null,
-      volume_m3: 0,
-      depth_cm: 0,
-      horsepower: 0,
-      cedar_depth_mm: 0,
-      cedar_tts_min: -1,
-      cedar_auth: false,
-      display_state: "CLEAR",
-    };
-  }
+const layer = L.layerGroup().addTo(map);
+const pin = (ll,color)=>L.circleMarker(ll,{radius:7,color:"#fff",weight:3,fillColor:color,fillOpacity:1});
 
-  const raw_tts    = (cap / net) * 60;
-  const raw_volume = Math.min(cap, (net * DUR_MIN) / 60);
-  const raw_depth  = (raw_volume / cap) * depCm;
-  const raw_hp     = (net * (HEAD_PPM / SCALE)) / HP_DENOM / (EFF_PPM / SCALE);
-
-  // Cedar integers: floor of raw
-  const cedar_depth_mm = Math.floor(raw_depth * 10);
-  const cedar_tts_min  = Math.floor(raw_tts);
-
-  const cedar_auth = cedar_depth_mm >= DEPTH_THR && cedar_tts_min <= TTS_THR;
-
-  // Visual state
-  let display_state;
-  if (cedar_depth_mm >= 350 && cedar_tts_min <= TTS_THR) {
-    display_state = "INUNDATED";
-  } else if (cedar_tts_min <= TTS_IMMINENT) {
-    display_state = "IMMINENT";
-  } else if (cedar_tts_min <= TTS_WATCH) {
-    display_state = "WATCH";
-  } else {
-    display_state = "CLEAR";
-  }
-
-  return {
-    active: true,
-    tts_min:    halfUp2dp(raw_tts),
-    volume_m3:  halfUp2dp(raw_volume),
-    depth_cm:   halfUp2dp(raw_depth),
-    horsepower: halfUp2dp(raw_hp),
-    cedar_depth_mm,
-    cedar_tts_min,
-    cedar_auth,
-    display_state,
-    // for display (mm)
-    depth_mm: Math.floor(raw_depth * 10),
-  };
+// ── Render ────────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+function classify(r){            // layman level for one sink
+  if(r.status!=="HAZARD_ACTIVE") return "clear";
+  if(r.cedar_authorization==="DISPATCH_AUTHORIZED" || r.depth_mm>=350 || (r.tts_min!==null && r.tts_min<=45)) return "danger";
+  return "watch";
 }
+function render(results, mode){
+  layer.clearLayers();
+  const lv = results.map(classify);
+  const minto = lv[0];
+  const reroute = minto==="danger";
 
-// ── Load-time assertion: 65 mm/hr on Minto Bridge (Phase 1 golden) ──────────
-(function assertGolden() {
-  const MINTO = SINKS[0];
-  const r = computeHazard(MINTO, 65);
-  // From Phase 1 Python output (65 mm/hr):
-  // inflow=2900.30, net=2780.30, tts=39.92min, vol=695.08m3, depth=13.15cm (131mm), hp=51.49
-  console.assert(r.active === true,             "golden: Minto 65mm active");
-  console.assert(r.tts_min    === 39.92,        "golden: Minto 65mm tts=" + r.tts_min + " expected 39.92");
-  console.assert(r.volume_m3  === 695.08,       "golden: Minto 65mm vol=" + r.volume_m3 + " expected 695.08");
-  console.assert(r.depth_cm   === 13.15,        "golden: Minto 65mm depth=" + r.depth_cm + " expected 13.15");
-  console.assert(r.cedar_depth_mm === 131,      "golden: Minto 65mm cedar_depth_mm=" + r.cedar_depth_mm + " expected 131");
-  console.assert(r.cedar_tts_min  === 39,       "golden: Minto 65mm cedar_tts=" + r.cedar_tts_min + " expected 39");
-  console.assert(r.cedar_auth === false,         "golden: Minto 65mm DENIED");
-  if (r.tts_min !== 39.92 || r.depth_cm !== 13.15) {
-    console.warn("[HydroSentry] Golden value mismatch — check compute port", r);
-  } else {
-    console.info("[HydroSentry] Golden assertion passed: Minto 65 mm/hr matches Phase 1");
-  }
-})();
+  // Main route (greyed when rerouting) + origin/destination pins
+  L.polyline(MAIN,{color:reroute?"#9aa0a6":"#1a73e8",weight:reroute?5:7,opacity:reroute?.7:1,dashArray:reroute?"2 10":null,lineCap:"round"}).addTo(layer);
+  if(reroute) L.polyline(BYPASS,{color:"#188038",weight:7,lineCap:"round"}).addTo(layer);
+  pin(CP,"#1a73e8").addTo(layer).bindTooltip("Connaught Place",{permanent:true,direction:"left",className:"lbl"});
+  pin(LN,"#d93025").addTo(layer).bindTooltip("Lajpat Nagar",{permanent:true,direction:"bottom",className:"lbl"});
 
-// ── Map Setup ───────────────────────────────────────────────────────────────
-const map = L.map("map", { zoomControl: true, attributionControl: true });
-
-const osmTiles = L.tileLayer(
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
-    maxZoom: 19,
-  }
-);
-
-const cartoDark = L.tileLayer(
-  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-  {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OSM</a> &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>',
-    subdomains: "abcd",
-    maxZoom: 19,
-  }
-);
-
-osmTiles.addTo(map);
-
-// Tile error fallback (switch once to CARTO dark)
-let tilesFailed = false;
-osmTiles.on("tileerror", function () {
-  if (tilesFailed) return;
-  tilesFailed = true;
-  map.removeLayer(osmTiles);
-  cartoDark.addTo(map);
-  const notice = document.getElementById("tile-notice");
-  notice.style.display = "block";
-  notice.textContent = "OSM tiles unavailable — CARTO fallback active";
-});
-
-// Initial view then fitBounds
-map.setView([28.6139, 77.2090], 12);
-const bounds = L.latLngBounds(SINKS.map(s => [s.lat, s.lng]));
-map.fitBounds(bounds, { padding: [40, 40] });
-
-// Invalidate on load + ResizeObserver
-map.invalidateSize();
-if (typeof ResizeObserver !== "undefined") {
-  new ResizeObserver(() => map.invalidateSize()).observe(document.getElementById("map-wrap"));
-}
-
-// ── Layer Groups ─────────────────────────────────────────────────────────────
-const baseGroup   = L.layerGroup().addTo(map);
-const hazardGroup = L.layerGroup().addTo(map);
-
-// ── Base markers (neutral, never cleared) ───────────────────────────────────
-SINKS.forEach(sink => {
-  L.circleMarker([sink.lat, sink.lng], {
-    radius: 9,
-    color: "#3b82f6",
-    fillColor: "#1e3a5f",
-    fillOpacity: 0.85,
-    weight: 2,
-    pane: "overlayPane",
-  })
-  .bindTooltip(sink.name, { direction: "top", className: "map-label", offset: [0, -6] })
-  .addTo(baseGroup);
-});
-
-// ── Render ───────────────────────────────────────────────────────────────────
-const STATE_COLORS = {
-  CLEAR:     { circle: "#3b82f6", fill: "#1e3a5f" },
-  WATCH:     { circle: "#eab308", fill: "#3d2e00" },
-  IMMINENT:  { circle: "#ef4444", fill: "#3d0f0f" },
-  INUNDATED: { circle: "#ff4444", fill: "#4a0000" },
-};
-
-function makeLabelIcon(text) {
-  return L.divIcon({
-    className: "",
-    html: '<div class="map-label">' + text + "</div>",
-    iconAnchor: [0, 0],
+  // Flooded sinks: red zone + hazard icon
+  SINKS.forEach((s,i)=>{
+    if(lv[i]!=="danger") return;
+    L.circle(s.ll,{radius:260,color:"#d93025",weight:2,fillColor:"#d93025",fillOpacity:.35}).addTo(layer);
+    L.marker(s.ll,{icon:L.divIcon({className:"",html:'<div class="hazard-icon">⚠</div>',iconSize:[30,30],iconAnchor:[15,15]})})
+      .addTo(layer).bindTooltip(s.name,{direction:"right",className:"lbl"});
   });
-}
 
-function render(stateMap) {
-  // stateMap: { sinkId: HazardResult }
-  hazardGroup.clearLayers();
+  // Drawer
+  const st=$("status"), sub=$("sub");
+  if(reroute){
+    st.className="bad"; st.textContent="⚠️ Rerouted around Minto Underpass • +4 mins • 100% Dry Road";
+    sub.textContent="Flooding expected on the usual route. New trip: 26 mins.";
+  } else {
+    st.className = minto==="watch" ? "warn" : "ok"; st.textContent="Route Normal • 22 mins";
+    sub.textContent = minto==="watch" ? "Light rain — we're keeping an eye on Minto Underpass." : "No flooding on your route.";
+  }
+  $("note").textContent = (mode==="api" ? "Live data from "+API_BASE_URL : "Offline demo (backend not reachable at "+API_BASE_URL+")")
+    + " • Illustrative route, not navigation";
 
-  const active = SINKS
-    .map(s => ({ sink: s, result: stateMap[s.id] }))
-    .filter(x => x.result.active);
-
-  // IMMINENT / INUNDATED sinks get overlays
-  active.forEach(({ sink, result }) => {
-    const state = result.display_state;
-    if (state === "IMMINENT" || state === "INUNDATED") {
-      // Pulse ring (divIcon)
-      L.marker([sink.lat, sink.lng], {
-        icon: L.divIcon({
-          className: "divicon-ring",
-          iconSize: [28, 28],
-          iconAnchor: [14, 14],
-        }),
-        interactive: false,
-      }).addTo(hazardGroup);
-
-      // Static backing circle
-      L.circle([sink.lat, sink.lng], {
-        radius: 120,
-        color: "#ef4444",
-        fillColor: "#7f1d1d",
-        fillOpacity: 0.25,
-        weight: 1.5,
-        interactive: false,
-      }).addTo(hazardGroup);
-
-      // Corridor polygon
-      const poly = L.polygon(sink.corridorPolygon, {
-        color: "#ef4444",
-        fillColor: "#991b1b",
-        fillOpacity: 0.35,
-        weight: 2,
-        interactive: false,
-      }).addTo(hazardGroup);
-
-      // Corridor label
-      const polyCenter = poly.getBounds().getCenter();
-      L.marker([polyCenter.lat, polyCenter.lng], {
-        icon: makeLabelIcon("ROAD CLOSED"),
-        interactive: false,
-      }).addTo(hazardGroup);
-
-      // Detour polyline
-      L.polyline(sink.detour, {
-        color: "#22c55e",
-        weight: 3,
-        dashArray: "8 4",
-        interactive: false,
-      }).addTo(hazardGroup);
-
-      // Detour label (midpoint)
-      const mid = sink.detour[Math.floor(sink.detour.length / 2)];
-      L.marker(mid, {
-        icon: makeLabelIcon("DETOUR – ILLUSTRATIVE, NOT NAVIGATION"),
-        interactive: false,
-      }).addTo(hazardGroup);
+  // Officer cards (textContent only)
+  const box=$("cards"); box.textContent="";
+  SINKS.forEach((s,i)=>{
+    const r=results[i], c=document.createElement("div"); c.className="card";
+    const b=document.createElement("b"); b.textContent=s.name;
+    const m=document.createElement("div"); m.className="meta";
+    const chip=document.createElement("span"); chip.className="chip";
+    if(r.status!=="HAZARD_ACTIVE"){ m.textContent="Water is draining normally."; chip.classList.add("none"); chip.textContent="No pump needed"; }
+    else {
+      m.textContent="Water "+r.depth_mm+" mm of 350 mm danger level • about "+r.tts_min+" min to danger • pump power ~"+Math.round(r.required_pump_hp)+" HP";
+      if(r.cedar_authorization==="DISPATCH_AUTHORIZED"){ chip.classList.add("go"); chip.textContent="Dispatch pump now"; }
+      else { chip.classList.add("stby"); chip.textContent="Standby — not yet at dispatch level"; }
     }
+    c.append(b,m,chip); box.append(c);
   });
-
-  updateConsole(stateMap);
 }
 
-// ── Console Render ────────────────────────────────────────────────────────────
-function updateConsole(stateMap) {
-  renderQueue(stateMap);
-  renderCards(stateMap);
-  renderEvent(stateMap);
+async function run(name){
+  document.querySelectorAll("#sims button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.s===name));
+  const rain=SCENARIOS[name];
+  let results, mode="api";
+  try { results = await Promise.all(SINKS.map(s=>fetchSink(s,rain))); }
+  catch(e){ mode="local"; results = SINKS.map(s=>localCompute(s,rain)); }
+  render(results, mode);
 }
-
-function stateClass(state) {
-  return {
-    CLEAR:     "dot-clear",
-    WATCH:     "dot-watch",
-    IMMINENT:  "dot-imminent",
-    INUNDATED: "dot-inundated",
-  }[state] || "dot-clear";
-}
-
-function stateBadgeClass(state) {
-  return {
-    CLEAR:     "st-clear",
-    WATCH:     "st-watch",
-    IMMINENT:  "st-imminent",
-    INUNDATED: "st-inundated",
-  }[state] || "st-clear";
-}
-
-function renderQueue(stateMap) {
-  const tbody = document.getElementById("queue-body");
-  // Sort: active ascending by tts_floor; ties by sink_id; inactive last
-  const rows = SINKS.map(s => ({ sink: s, r: stateMap[s.id] }));
-  rows.sort((a, b) => {
-    const aA = a.r.active, bA = b.r.active;
-    if (aA !== bA) return aA ? -1 : 1;
-    if (!aA && !bA) return a.sink.id.localeCompare(b.sink.id);
-    const tA = a.r.cedar_tts_min, tB = b.r.cedar_tts_min;
-    if (tA !== tB) return tA - tB;
-    return a.sink.id.localeCompare(b.sink.id);
-  });
-
-  const activeRows = rows.filter(x => x.r.active);
-  if (activeRows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" id="queue-empty" style="padding:14px 10px;color:var(--text-dim);font-size:12px;font-style:italic;text-align:center;">No active hazards</td></tr>';
-    return;
-  }
-
-  let html = "";
-  rows.forEach(({ sink, r }) => {
-    const dotCls = stateClass(r.display_state);
-    const ttsStr = r.active ? String(r.cedar_tts_min) : "—";
-    const depStr = r.active ? String(r.cedar_depth_mm) + " mm" : "—";
-    const cedarStr = r.active ? (r.cedar_auth ? "AUTH" : "DENY") : "—";
-    const cedarCls = r.cedar_auth ? "style=\"color:var(--green);font-weight:700\"" : "style=\"color:var(--text-dim)\"";
-    html += "<tr>";
-    html += '<td><span class="dot ' + dotCls + '"></span>' + sink.name.split(" ")[0] + " " + sink.name.split(" ")[1] + "</td>";
-    html += "<td>" + ttsStr + "</td>";
-    html += "<td>" + depStr + "</td>";
-    html += '<td ' + cedarCls + ">" + cedarStr + "</td>";
-    html += "</tr>";
-  });
-  tbody.innerHTML = html;
-}
-
-function renderCards(stateMap) {
-  const wrap = document.getElementById("cards-wrap");
-  let html = "";
-  SINKS.forEach(sink => {
-    const r = stateMap[sink.id];
-    const state = r.display_state;
-    const bCls = stateBadgeClass(state);
-
-    const depVal  = r.active ? String(r.cedar_depth_mm) : "—";
-    const ttsVal  = r.active ? (r.cedar_tts_min < 0 ? "—" : String(r.cedar_tts_min)) : "—";
-    const hpVal   = r.active ? String(r.horsepower) : "—";
-
-    const depCls  = r.active && r.cedar_depth_mm >= 350 ? "crit" : r.active && r.cedar_depth_mm > 100 ? "warn" : "";
-    const ttsCls  = r.active && r.cedar_tts_min <= TTS_THR ? "crit" : r.active && r.cedar_tts_min <= TTS_IMMINENT ? "warn" : "";
-
-    const cedarTxt = r.active ? (r.cedar_auth ? "DISPATCH_AUTHORIZED" : "DISPATCH_DENIED") : "—";
-    const cedarCls = r.cedar_auth ? "cedar-auth" : "cedar-deny";
-
-    html += '<div class="sink-card">';
-    html += '  <div class="card-title">';
-    html += '    <span>' + sink.name + '</span>';
-    html += '    <span class="card-id">' + sink.id + '</span>';
-    html += '    <span class="state-badge ' + bCls + '">' + state + '</span>';
-    html += '  </div>';
-    html += '  <div class="metrics-row">';
-    html += '    <div class="metric"><div class="metric-lbl">Depth (mm)</div><div class="metric-val ' + depCls + '">' + depVal + '</div></div>';
-    html += '    <div class="metric"><div class="metric-lbl">TTS (min)</div><div class="metric-val ' + ttsCls + '">' + ttsVal + '</div></div>';
-    html += '    <div class="metric"><div class="metric-lbl">Pump HP</div><div class="metric-val">' + hpVal + '</div></div>';
-    html += '  </div>';
-    html += '  <div class="cedar-row"><span class="cedar-lbl">Cedar:</span> <span class="' + cedarCls + '">' + cedarTxt + '</span></div>';
-    html += '</div>';
-  });
-  wrap.innerHTML = html;
-}
-
-function renderEvent(stateMap) {
-  const dot   = document.getElementById("event-status-dot");
-  const label = document.getElementById("event-status-label");
-  const ts    = document.getElementById("event-timestamp");
-  const pre   = document.getElementById("event-payload");
-
-  const authorized = SINKS.filter(s => stateMap[s.id].cedar_auth);
-
-  if (authorized.length === 0) {
-    dot.className = "";
-    label.textContent = "No dispatch authorized";
-    ts.textContent = "";
-    pre.textContent = "(no dispatch authorized)";
-    return;
-  }
-
-  // Show first authorized sink payload (mirrors Phase 2 EventBridge event)
-  const s = authorized[0];
-  const r = stateMap[s.id];
-
-  dot.className = "active";
-  label.textContent = "DISPATCH AUTHORIZED — " + s.name;
-  ts.textContent = FIXED_CLOCK;
-
-  const payload = {
-    source: "hydrosentry.engine",
-    "detail-type": "EmergencyDispatchAuthorized",
-    detail: {
-      sink_id:   s.id,
-      depth_mm:  r.cedar_depth_mm,
-      tts_min:   r.cedar_tts_min,
-    },
-    time: FIXED_CLOCK,
-  };
-  pre.textContent = JSON.stringify(payload, null, 2);
-}
-
-// ── Scenario Definitions ─────────────────────────────────────────────────────
-function computeScenario(rainfallMmHr) {
-  const state = {};
-  SINKS.forEach(s => { state[s.id] = computeHazard(s, rainfallMmHr); });
-  return state;
-}
-
-const SCENARIOS = {
-  dry:        () => {
-    const state = {};
-    SINKS.forEach(s => {
-      state[s.id] = {
-        active: false, tts_min: null, volume_m3: 0, depth_cm: 0, horsepower: 0,
-        cedar_depth_mm: 0, cedar_tts_min: -1, cedar_auth: false,
-        display_state: "CLEAR",
-      };
-    });
-    return state;
-  },
-  moderate:   () => computeScenario(15),
-  cloudburst: () => computeScenario(65),
-};
-
-// ── Button Controls ──────────────────────────────────────────────────────────
-let currentScenario = "dry";
-let lastHazardCount = 0; // for exit-gate test
-
-function setScenario(name) {
-  currentScenario = name;
-  document.querySelectorAll(".ctrl").forEach(btn => {
-    btn.setAttribute("aria-pressed", btn.dataset.scenario === name ? "true" : "false");
-  });
-  const stateMap = SCENARIOS[name]();
-  render(stateMap);
-  // Track hazardGroup layer count for exit-gate validation
-  lastHazardCount = hazardGroup.getLayers().length;
-  console.info("[HydroSentry] Scenario=" + name + " hazardLayers=" + lastHazardCount);
-}
-
-document.getElementById("btn-dry")       .addEventListener("click", () => setScenario("dry"));
-document.getElementById("btn-moderate")  .addEventListener("click", () => setScenario("moderate"));
-document.getElementById("btn-cloudburst").addEventListener("click", () => setScenario("cloudburst"));
-
-// Expose for console testing
-window._HS = {
-  hazardGroup,
-  setScenario,
-  computeHazard,
-  SINKS,
-  getHazardLayerCount: () => hazardGroup.getLayers().length,
-};
-
-// ── Live API mode ─────────────────────────────────────────────────────────────
-if (API_BASE !== "") {
-  document.getElementById("mode-badge").className = "badge-live";
-  document.getElementById("mode-badge").textContent = "CEDAR VERIFIED";
-}
-
-// ── Initial Render ───────────────────────────────────────────────────────────
-setScenario("dry");
-
-// ── Global error guard ───────────────────────────────────────────────────────
-window.addEventListener("error", function (e) {
-  console.error("[HydroSentry] Uncaught error:", e.message, e.filename, e.lineno);
+document.querySelectorAll("#sims button").forEach(b=>b.addEventListener("click",()=>run(b.dataset.s)));
+$("officerBtn").addEventListener("click",()=>{
+  const open=$("officer").classList.toggle("open");
+  $("officerBtn").setAttribute("aria-pressed",open);
+  $("officerBtn").textContent = open ? "Close" : "Officer View";
 });
-window.addEventListener("unhandledrejection", function (e) {
-  console.error("[HydroSentry] Unhandled promise rejection:", e.reason);
-});
+window.addEventListener("error",e=>console.error("[HydroSentry]",e.message));
+run("dry");
 </script>
 </body>
 </html>

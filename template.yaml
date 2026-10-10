@@ -110,7 +110,8 @@ Resources:
       Timeout: 10
       Environment:
         Variables:
-          TABLE_NAME: !Ref HazardStateTable
+          ENVIRONMENT: !If [UseLocalEndpoint, LOCAL, AWS]
+          DYNAMODB_TABLE_NAME: !Ref HazardStateTable
           EVENT_BUS_NAME: !Ref HydroSentryBus
           AWS_ENDPOINT_URL: !If
             - UseLocalEndpoint
@@ -147,7 +148,7 @@ Resources:
   HydroSentryBus:
     Type: AWS::Events::EventBus
     Properties:
-      Name: HydroSentry-Bus
+      Name: HydroSentry-EventBus
 
   EmergencyDispatchRule:
     Type: AWS::Events::Rule

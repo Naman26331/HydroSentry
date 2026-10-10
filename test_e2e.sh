@@ -41,7 +41,7 @@ unset AWS_PROFILE AWS_SESSION_TOKEN AWS_ENDPOINT_URL 2>/dev/null || true
 NET="hydrosentry-e2e-net"
 EMU_NAME="hydrosentry-e2e-emulator"
 TABLE_NAME="HydroSentry-HazardState"
-BUS_NAME="HydroSentry-Bus"
+BUS_NAME="HydroSentry-EventBus"
 RULE_NAME="EmergencyDispatchRule"
 TOPIC_NAME="HydroSentry-EmergencyAlerts"
 QUEUE_NAME="hydrosentry-e2e-capture"
@@ -450,7 +450,7 @@ fi
 # Repo env.json hardcodes host.docker.internal and would override the
 # parameter; generate one pointing at the endpoint Lambda can actually reach.
 cat > "$TMP/env.json" <<EOF
-{"ComputeFunction": {"TABLE_NAME": "$TABLE_NAME", "EVENT_BUS_NAME": "$BUS_NAME", "AWS_ENDPOINT_URL": "$LAMBDA_ENDPOINT"}}
+{"ComputeFunction": {"ENVIRONMENT": "LOCAL", "DYNAMODB_TABLE_NAME": "$TABLE_NAME", "EVENT_BUS_NAME": "$BUS_NAME", "AWS_ENDPOINT_URL": "$LAMBDA_ENDPOINT"}}
 EOF
 
 set -m                                  # own process group for sam

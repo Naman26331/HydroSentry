@@ -4,10 +4,12 @@ Routes:
     POST /telemetry/rainfall  — Ingest rainfall data, compute hazard, store, emit events
     GET  /hazards/active      — Return active hazard states from DynamoDB
 
-Environment:
-    TABLE_NAME      — DynamoDB table name (HydroSentry-HazardState)
-    EVENT_BUS_NAME  — EventBridge bus name (HydroSentry-Bus)
-    AWS_ENDPOINT_URL — Optional LocalStack endpoint
+Environment (see .env.example):
+    ENVIRONMENT          — LOCAL (use AWS_ENDPOINT_URL / LocalStack) or AWS (ambient IAM role)
+    DYNAMODB_TABLE_NAME  — DynamoDB table name
+    EVENT_BUS_NAME       — EventBridge bus name
+    AWS_REGION           — set automatically by Lambda; defaults to ap-south-1 locally
+    AWS_ENDPOINT_URL     — LOCAL only; emulator endpoint
 """
 from __future__ import annotations
 
@@ -16,18 +18,19 @@ import os
 import time
 from decimal import Decimal, ROUND_HALF_UP
 
-# ── boto3 import (available in Lambda runtime) ────────────────────────────────
 import boto3
 
 # ── Environment ───────────────────────────────────────────────────────────────
-TABLE_NAME     = os.environ.get("TABLE_NAME", "HydroSentry-HazardState")
-EVENT_BUS_NAME = os.environ.get("EVENT_BUS_NAME", "HydroSentry-Bus")
-ENDPOINT_URL   = os.environ.get("AWS_ENDPOINT_URL", "")
+ENVIRONMENT    = os.environ.get("ENVIRONMENT", "AWS").upper()
+TABLE_NAME     = os.environ.get("DYNAMODB_TABLE_NAME", "HydroSentry-HazardState")
+EVENT_BUS_NAME = os.environ.get("EVENT_BUS_NAME", "HydroSentry-EventBus")
+REGION         = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or "ap-south-1"
 
 # ── boto3 clients ─────────────────────────────────────────────────────────────
-_client_kwargs = {}
-if ENDPOINT_URL:
-    _client_kwargs["endpoint_url"] = ENDPOINT_URL
+# LOCAL: talk to the emulator. AWS: default endpoints + ambient IAM role.
+_client_kwargs = {"region_name": REGION}
+if ENVIRONMENT == "LOCAL":
+    _client_kwargs["endpoint_url"] = os.environ.get("AWS_ENDPOINT_URL") or "http://localhost:4566"
 
 dynamodb    = boto3.client("dynamodb", **_client_kwargs)
 eventbridge = boto3.client("events",   **_client_kwargs)

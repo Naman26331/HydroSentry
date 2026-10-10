@@ -222,6 +222,15 @@ GET /hazards/active
 
 ---
 
+### Phase 5 — Frontend overhaul & configuration layer (in progress, awaiting review)
+
+- `console.html` replaced by a Google-Maps-style client (OSM tiles, keyless; single `API_BASE_URL` constant; offline fallback uses ported Phase 1 maths). Fixed a wrong Leaflet SRI hash that stopped the old console from loading Leaflet.
+- Backend config now via `ENVIRONMENT` (LOCAL|AWS), `DYNAMODB_TABLE_NAME`, `EVENT_BUS_NAME`; bus renamed `HydroSentry-EventBus`. See `.env.example`.
+- `GET /hazards/active` filters on `expires_at` and aliases reserved word `status`.
+- `test_e2e.sh` + `DEMO_SCRIPT.md` written; **e2e not yet run end-to-end** (needs Docker, sam, cedar, aws, LOCALSTACK_AUTH_TOKEN).
+
+---
+
 ## Seed Data Reference
 
 | Sink ID | Name | Lat | Lon | Geohash-6 | Invert (m) | Catchment (m²) | C | Vol (m³) | Drain (m³/hr) |
