@@ -45,14 +45,13 @@ Parameters:
 # =========================================================================
 Conditions:
   UseLocalEndpoint: !Not [!Equals [!Ref LocalEndpointUrl, ""]]
-  HasAlertEmail:    !Not [!Equals [!Ref AlertEmail, ""]]
-  HasAlertHttps:    !Not [!Equals [!Ref AlertHttpsEndpoint, ""]]
+  HasAlertEmail: !Not [!Equals [!Ref AlertEmail, ""]]
+  HasAlertHttps: !Not [!Equals [!Ref AlertHttpsEndpoint, ""]]
 
 # =========================================================================
 # Resources
 # =========================================================================
 Resources:
-
   # ── A. DynamoDB — Hazard State Table ────────────────────────────────────
   HazardStateTable:
     Type: AWS::DynamoDB::Table
@@ -103,7 +102,7 @@ Resources:
       FunctionName: HydroSentry-Compute
       CodeUri: src/
       Handler: app.lambda_handler
-      Runtime: python3.12
+      Runtime: python3.13
       Architectures:
         - arm64
       MemorySize: 128
