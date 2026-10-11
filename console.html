@@ -10,49 +10,47 @@
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* Extra-bold weight for the big readings */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@800&display=swap');
-
-/* ── Theme tokens: calm, premium control-room palette ──
-   Meaning of colours (used consistently everywhere):
-   --g    cyan/teal  → app accent, normal info
-   --ok   green      → safe / route clear / nominal
-   --warn amber      → warning / approaching danger
-   --bad  red        → danger / dispatch authorized / over 350 mm
-   (--g and --bad are also referenced by the JavaScript, keep the names.) */
+/* ── Theme tokens: Precision Dark Control-Room Palette (Matte Finish) ──
+   Subdued, professional, glare-free aesthetic.
+   No neon blooms, no glossy specular gradients.
+   --g    slate-cyan → technical accent
+   --ok   emerald    → route clear / nominal
+   --warn amber      → warning / approaching threshold
+   --bad  coral red  → danger / dispatch authorized / over 350 mm
+*/
 :root {
   color-scheme: dark;
-  --g: #22d3ee;
-  --g-light: rgba(34, 211, 238, 0.12);
-  --g-ink: #021219;
-  --g-glow: 0 0 0 1px rgba(34, 211, 238, 0.55), 0 0 18px rgba(34, 211, 238, 0.4), 0 4px 14px rgba(34, 211, 238, 0.22);
+  --g: #38bdf8;
+  --g-light: rgba(56, 189, 248, 0.08);
+  --g-ink: #0b0f17;
+  --g-glow: none;
   --ok: #22c55e;
-  --ok-light: rgba(34, 197, 94, 0.13);
+  --ok-light: rgba(34, 197, 94, 0.1);
   --bad: #ef4444;
-  --bad-light: rgba(239, 68, 68, 0.14);
+  --bad-light: rgba(239, 68, 68, 0.1);
   --warn: #f59e0b;
-  --warn-light: rgba(245, 158, 11, 0.13);
-  --bg: #050912;
-  --surface: linear-gradient(180deg, rgba(24, 35, 56, 0.9) 0%, rgba(13, 20, 34, 0.92) 100%);
-  --surface-solid: linear-gradient(180deg, #172238 0%, #0f1828 100%);
-  --card: #111a2c;
-  --card-hi: #172238;
-  --ink: #edf2fa;
-  --sub: #8a9bb5;
-  --label: #6e809b;
-  --line: rgba(148, 163, 184, 0.14);
-  --line-hi: rgba(148, 163, 184, 0.26);
-  --top-hi: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
-  --sh-md: 0 10px 28px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
-  --sh-lg: 0 24px 60px rgba(0, 0, 0, 0.6), 0 4px 14px rgba(0, 0, 0, 0.4);
-  --r-panel: 22px;
-  --r-card: 16px;
-  --r-inner: 12px;
+  --warn-light: rgba(245, 158, 11, 0.1);
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface-solid: #161b22;
+  --card: #1c2128;
+  --card-hi: #22272e;
+  --ink: #e6edf3;
+  --sub: #8b949e;
+  --label: #6e7681;
+  --line: #30363d;
+  --line-hi: #444c56;
+  --top-hi: none;
+  --sh-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --sh-md: 0 4px 14px rgba(0, 0, 0, 0.45);
+  --sh-lg: 0 12px 28px rgba(0, 0, 0, 0.55);
+  --r-panel: 14px;
+  --r-card: 10px;
+  --r-inner: 8px;
   --r-pill: 999px;
-  --glass: blur(18px) saturate(140%);
+  --glass: none;
   --font: 'Inter', Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --safe-top: env(safe-area-inset-top, 10px);
   --safe-bottom: env(safe-area-inset-bottom, 12px);
@@ -80,94 +78,85 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
   position: fixed;
   inset: 0;
   z-index: 1;
-  background: #0b1526;
+  background: #0d1117;
 }
-/* Dark map: darken the street tiles only; routes and markers stay bright.
-   The slight transparency lets the navy map background tint the tiles. */
+/* Dark map: subdued street tiles without neon glare */
 #map .leaflet-tile-pane {
-  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.95) saturate(0.25);
-  opacity: 0.82;
+  filter: invert(1) hue-rotate(180deg) brightness(0.82) contrast(0.92) saturate(0.2);
+  opacity: 0.85;
 }
-/* Soft vignette so the floating panels read clearly over the map */
+/* Soft vignette to ground the map */
 #map::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 450;
   pointer-events: none;
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(3, 6, 12, 0.55) 100%);
+  background: radial-gradient(ellipse at center, transparent 65%, rgba(13, 17, 23, 0.6) 100%);
 }
 .leaflet-container .leaflet-control-attribution {
-  background: rgba(5, 9, 18, 0.72);
+  background: rgba(13, 17, 23, 0.88);
   color: var(--sub);
   border-top-left-radius: 6px;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
 }
-.leaflet-container .leaflet-control-attribution a { color: var(--g); }
+.leaflet-container .leaflet-control-attribution a { color: var(--g); text-decoration: none; }
 
-/* ── Top Floating Command Bar (dark glass, two tiers) ── */
+/* ── Command Navigation Dock ── */
 #top {
   position: fixed;
   z-index: 1000;
-  top: max(12px, var(--safe-top));
-  left: 12px;
-  right: 12px;
+  top: max(14px, var(--safe-top));
+  left: 14px;
+  right: 14px;
   max-width: 760px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 8px;
+  padding: 10px 12px;
   background: var(--surface);
-  backdrop-filter: var(--glass);
-  -webkit-backdrop-filter: var(--glass);
   border: 1px solid var(--line);
   border-radius: var(--r-panel);
-  box-shadow: var(--top-hi), var(--sh-lg);
+  box-shadow: var(--sh-md);
   pointer-events: none;
 }
 #top > * { pointer-events: auto; }
 
-/* Tier 1: Primary Navigation */
+/* Tier 1: Full-Width Route Corridor Pill */
 .tier-1 {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   width: 100%;
 }
 #pill {
   flex: 1;
   min-width: 0;
-  height: 46px;
-  background: rgba(255, 255, 255, 0.035);
+  height: 42px;
+  background: #1c2128;
   border-radius: var(--r-pill);
-  padding: 6px 6px 6px 16px;
+  padding: 4px 6px 4px 14px;
   border: 1px solid var(--line);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
-#pill:hover { border-color: var(--line-hi); background: rgba(255, 255, 255, 0.055); }
+#pill:hover { border-color: var(--line-hi); background: #22272e; }
 #pill .dot {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--g);
   flex-shrink: 0;
-  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18), 0 0 12px rgba(34, 211, 238, 0.7);
-  animation: breathe 3.2s ease-in-out infinite;
-}
-@keyframes breathe {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.16), 0 0 10px rgba(34, 211, 238, 0.55); }
-  50% { box-shadow: 0 0 0 5px rgba(34, 211, 238, 0.08), 0 0 16px rgba(34, 211, 238, 0.85); }
 }
 #pill .route-title {
   flex: 1;
   min-width: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.005em;
   color: var(--ink);
@@ -177,51 +166,25 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
 }
 #changeBtn {
   flex-shrink: 0;
-  height: 34px;
-  border: 1px solid rgba(34, 211, 238, 0.4);
-  background: var(--g-light);
-  color: var(--g);
-  font: 700 11px var(--font);
-  letter-spacing: 0.1em;
+  height: 30px;
+  border: 1px solid var(--line);
+  background: #21262d;
+  color: var(--sub);
+  font: 600 11px var(--font);
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   border-radius: var(--r-pill);
-  padding: 0 16px;
+  padding: 0 12px;
   cursor: pointer;
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.15);
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 #changeBtn:hover {
-  background: rgba(34, 211, 238, 0.2);
-  border-color: rgba(34, 211, 238, 0.7);
-  box-shadow: 0 0 18px rgba(34, 211, 238, 0.3);
+  background: #28303d;
+  border-color: #388bfd;
+  color: #58a6ff;
 }
 
-#officerBtn {
-  flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.035);
-  border-radius: var(--r-pill);
-  padding: 0 18px;
-  border: 1px solid var(--line);
-  color: var(--ink);
-  font: 600 13px var(--font);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-  height: 46px;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
-}
-#officerBtn:hover { border-color: var(--line-hi); background: rgba(255, 255, 255, 0.06); transform: translateY(-1px); }
-#officerBtn[aria-pressed=true] {
-  background: linear-gradient(180deg, #4ee3f5, var(--g));
-  color: var(--g-ink);
-  font-weight: 700;
-  border-color: transparent;
-  box-shadow: var(--g-glow);
-}
-
-/* Tier 2: Controls (segmented pills) */
+/* Tier 2: Vehicle Clearance & Weather Simulation Controls */
 .tier-2 {
   display: flex;
   align-items: center;
@@ -231,41 +194,84 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
 }
 .segmented-group {
   display: inline-flex;
-  gap: 3px;
-  background: rgba(2, 6, 14, 0.45);
+  gap: 2px;
+  background: #12151c;
   border-radius: var(--r-pill);
-  padding: 4px;
+  padding: 3px;
   border: 1px solid var(--line);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
   flex-shrink: 0;
 }
 .segmented-group button {
-  border: 0;
+  border: 1px solid transparent;
   background: none;
   border-radius: var(--r-pill);
-  padding: 8px 15px;
-  font: 500 12.5px var(--font);
+  padding: 5px 11px;
+  font: 500 12px var(--font);
   color: var(--sub);
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
-.segmented-group button:hover { color: var(--ink); background: rgba(148, 163, 184, 0.09); }
+.segmented-group button:hover { color: var(--ink); background: #1c2128; }
 .segmented-group button[aria-pressed=true] {
-  background: linear-gradient(180deg, #4ee3f5, var(--g));
-  color: var(--g-ink);
-  font-weight: 700;
-  box-shadow: var(--g-glow);
+  background: #232d3d;
+  color: #f0f6fc;
+  font-weight: 600;
+  border-color: #388bfd;
+}
+#sims button[data-s="dry"][aria-pressed=true] {
+  background: #222b38;
+  color: #f0f6fc;
+  border-color: #388bfd;
+}
+#sims button[data-s="moderate"][aria-pressed=true] {
+  background: #1e293b;
+  color: #93c5fd;
+  border-color: #60a5fa;
+}
+#sims button[data-s="cloudburst"][aria-pressed=true] {
+  background: #331f24;
+  color: #fca5a5;
+  border-color: #ef4444;
 }
 
-/* ── Route Switcher Modal ── */
+/* Tier 3: Officer View & Water Supply Actions */
+.tier-3 {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.tier-3 button {
+  flex: 1;
+  height: 34px;
+  border: 1px solid var(--line);
+  background: #1c2128;
+  color: var(--ink);
+  font: 600 12px var(--font);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.tier-3 button:hover {
+  background: #22272e;
+  border-color: var(--line-hi);
+}
+.tier-3 button[aria-pressed=true] {
+  background: #232d3d;
+  color: #f0f6fc;
+  border-color: #388bfd;
+}
+
+/* ── Route Switcher & Custom Route Modal (Matte Dark) ── */
 #routeModal {
   position: fixed;
   inset: 0;
   z-index: 2500;
-  background: rgba(3, 6, 12, 0.66);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(8, 11, 16, 0.78);
   display: none;
   align-items: center;
   justify-content: center;
@@ -273,120 +279,289 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
 }
 #routeModal.open { display: flex; }
 .modal-box {
-  background: var(--surface-solid);
+  background: #161b22;
   width: 100%;
-  max-width: 480px;
+  max-width: 520px;
   border-radius: var(--r-panel);
   border: 1px solid var(--line);
-  box-shadow: var(--top-hi), var(--sh-lg);
-  padding: 24px 24px 26px;
-  animation: modalPop 0.22s ease-out;
+  box-shadow: var(--sh-lg);
+  padding: 22px 22px 24px;
+  animation: modalPop 0.18s ease-out;
 }
 @keyframes modalPop {
-  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  from { opacity: 0; transform: scale(0.97) translateY(6px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 .modal-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 12px;
 }
 .modal-head h3 {
   margin: 0;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.015em;
   color: var(--ink);
 }
-.modal-subtitle {
-  font-size: 12.5px;
-  color: var(--sub);
-  margin-bottom: 20px;
-}
 .modal-close {
   border: 1px solid var(--line);
-  background: rgba(148, 163, 184, 0.08);
+  background: #1c2128;
   border-radius: 50%;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--sub);
-  transition: color 0.15s, background 0.15s;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
-.modal-close:hover { color: var(--ink); background: rgba(148, 163, 184, 0.16); }
+.modal-close:hover { color: var(--ink); background: #22272e; border-color: var(--line-hi); }
+
+/* Modal View Tabs */
+.modal-tabs {
+  display: flex;
+  gap: 4px;
+  background: #12151c;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 3px;
+  margin-bottom: 16px;
+}
+.modal-tab {
+  flex: 1;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--sub);
+  font: 600 12px var(--font);
+  padding: 7px 12px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.modal-tab:hover { color: var(--ink); }
+.modal-tab.active {
+  background: #232d3d;
+  color: #f0f6fc;
+  border-color: #388bfd;
+}
+
+.modal-subtitle {
+  font-size: 12px;
+  color: var(--sub);
+  margin-bottom: 14px;
+}
 .corridor-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 .corridor-item {
   border: 1px solid var(--line);
   border-radius: var(--r-card);
-  padding: 14px 16px;
+  padding: 12px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow: var(--top-hi);
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  background: #1c2128;
+  transition: border-color 0.15s ease, background 0.15s ease;
   text-align: left;
 }
 .corridor-item:hover {
-  border-color: rgba(34, 211, 238, 0.45);
-  transform: translateY(-1px);
+  border-color: #388bfd;
+  background: #212836;
 }
 .corridor-item.active {
-  border-color: rgba(34, 211, 238, 0.7);
-  background: var(--g-light);
-  box-shadow: var(--top-hi), 0 0 20px rgba(34, 211, 238, 0.15);
+  border-color: #388bfd;
+  background: #1d2738;
 }
 .corridor-item .c-icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--r-inner);
-  background: rgba(148, 163, 184, 0.1);
+  background: #22272e;
+  border: 1px solid var(--line);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  margin-right: 14px;
+  font-size: 16px;
+  margin-right: 12px;
   flex-shrink: 0;
 }
 .corridor-item.active .c-icon {
-  background: rgba(34, 211, 238, 0.2);
+  background: #28354a;
+  border-color: #388bfd;
 }
 .corridor-info {
   flex: 1;
   min-width: 0;
 }
 .corridor-title {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--ink);
 }
 .corridor-sub {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--sub);
   margin-top: 2px;
 }
 .corridor-meta {
   font-size: 11px;
   font-weight: 600;
-  color: var(--warn);
-  margin-top: 4px;
+  color: #d29922;
+  margin-top: 3px;
 }
 .corridor-check {
-  font-size: 18px;
-  color: var(--g);
-  font-weight: bold;
+  font-size: 16px;
+  color: #38bdf8;
+  font-weight: 700;
   margin-left: 8px;
-  text-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+}
+
+/* Custom Route Form Components */
+.custom-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.input-row label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+.select-wrap select {
+  width: 100%;
+  background: #12151c;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font: 500 13px var(--font);
+  border-radius: var(--r-inner);
+  padding: 9px 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.select-wrap select:focus {
+  border-color: #388bfd;
+}
+.swap-row {
+  display: flex;
+  justify-content: center;
+  margin: -2px 0;
+}
+.swap-btn {
+  background: #1c2128;
+  border: 1px solid var(--line);
+  color: var(--sub);
+  font: 600 11px var(--font);
+  border-radius: var(--r-pill);
+  padding: 3px 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.swap-btn:hover {
+  background: #222832;
+  color: var(--ink);
+  border-color: var(--line-hi);
+}
+.custom-tools {
+  margin-bottom: 12px;
+}
+.pick-map-btn {
+  width: 100%;
+  background: #1c2433;
+  border: 1px dashed #388bfd;
+  color: #58a6ff;
+  font: 600 12.5px var(--font);
+  border-radius: var(--r-inner);
+  padding: 9px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.15s;
+}
+.pick-map-btn:hover {
+  background: #243044;
+}
+.sink-detect-card {
+  background: #12151c;
+  border: 1px solid var(--line);
+  border-radius: var(--r-inner);
+  padding: 11px 13px;
+  margin-bottom: 14px;
+}
+.detect-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.detect-detail {
+  font-size: 11px;
+  color: var(--sub);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+.apply-btn {
+  width: 100%;
+  background: #238636;
+  border: 1px solid #2ea043;
+  color: #fff;
+  font: 700 13px var(--font);
+  border-radius: var(--r-inner);
+  padding: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.apply-btn:hover {
+  background: #2ea043;
+}
+
+/* Map Interactive Pick Notification */
+.map-pick-banner {
+  position: fixed;
+  z-index: 2000;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #161b22;
+  border: 1px solid #388bfd;
+  box-shadow: var(--sh-lg);
+  border-radius: var(--r-pill);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #f0f6fc;
+}
+.map-pick-banner button {
+  background: #21262d;
+  border: 1px solid var(--line);
+  color: var(--sub);
+  font: 600 11px var(--font);
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+.map-pick-banner button:hover {
+  color: var(--ink);
+  background: #30363d;
 }
 
 /* ── SNS Civic Alert Notification Banner ── */
@@ -398,16 +573,16 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
   right: 14px;
   max-width: 580px;
   margin: 0 auto;
-  background: var(--surface-solid);
+  background: #1a1618;
   border-radius: var(--r-card);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  box-shadow: var(--top-hi), var(--sh-lg), 0 0 36px rgba(239, 68, 68, 0.22);
-  padding: 14px 18px 15px 22px;
+  border: 1px solid #ef4444;
+  box-shadow: var(--sh-lg);
+  padding: 12px 16px 14px 20px;
   cursor: pointer;
   overflow: hidden;
   transform: translateY(-160%);
   opacity: 0;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s;
 }
 #toast::before {
   content: "";
@@ -417,7 +592,6 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
   bottom: 0;
   width: 4px;
   background: var(--bad);
-  box-shadow: 0 0 14px rgba(239, 68, 68, 0.9);
 }
 #toast.show { transform: translateY(0); opacity: 1; }
 .toast-header {
@@ -429,7 +603,7 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
   font-size: 10.5px;
   font-weight: 700;
   color: #f87171;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   display: flex;
   align-items: center;
@@ -438,90 +612,85 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
 .toast-close {
   border: 0;
   background: none;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--sub);
   cursor: pointer;
   padding: 2px 6px;
 }
 .toast-close:hover { color: var(--ink); }
 #toast .msg {
-  font-size: 14.5px;
+  font-size: 13.5px;
   font-weight: 600;
   line-height: 1.45;
-  margin-top: 6px;
+  margin-top: 5px;
   color: var(--ink);
 }
 
-/* ── Bottom Floating Status Card ── */
+/* ── Commuter Route Status Card (Matte Dark) ── */
 #drawer {
   position: fixed;
   z-index: 1000;
-  left: 12px;
-  right: 12px;
-  bottom: calc(12px + var(--safe-bottom));
+  left: 14px;
+  right: 14px;
+  bottom: calc(14px + var(--safe-bottom));
   background: var(--surface);
-  backdrop-filter: var(--glass);
-  -webkit-backdrop-filter: var(--glass);
   border-radius: var(--r-panel);
-  box-shadow: var(--top-hi), var(--sh-lg);
+  box-shadow: var(--sh-lg);
   border: 1px solid var(--line);
-  padding: 10px 24px 20px;
+  padding: 12px 20px 18px;
   max-width: 760px;
   margin: 0 auto;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .handle-bar {
-  width: 40px;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--line-hi);
-  margin: 0 auto 14px;
-  cursor: pointer;
+  display: none;
 }
 .drawer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   cursor: pointer;
 }
 #status {
-  font-size: 23px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
-#status.ok { color: var(--ok); text-shadow: 0 0 22px rgba(34, 197, 94, 0.25); }
-#status.warn { color: var(--warn); text-shadow: 0 0 22px rgba(245, 158, 11, 0.25); }
-#status.bad { color: #ff5c5c; text-shadow: 0 0 22px rgba(239, 68, 68, 0.45); }
+#status.ok { color: var(--ok); }
+#status.warn { color: var(--warn); }
+#status.bad { color: var(--bad); }
 
 .drawer-toggle {
   flex-shrink: 0;
   font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--sub);
-  background: rgba(148, 163, 184, 0.07);
+  background: #1c2128;
   border: 1px solid var(--line);
   border-radius: var(--r-pill);
-  padding: 6px 13px;
+  padding: 5px 11px;
   cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
 }
+.drawer-toggle:hover { color: var(--ink); border-color: var(--line-hi); }
 #sub {
-  margin-top: 6px;
-  font-size: 13.5px;
+  margin-top: 4px;
+  font-size: 12.5px;
   font-weight: 400;
   color: var(--sub);
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 /* Immediate Municipal Action Status Pill */
 .municipal-pill {
-  margin-top: 14px;
-  padding: 10px 14px;
+  margin-top: 10px;
+  padding: 8px 12px;
   border-radius: var(--r-inner);
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -529,72 +698,62 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
   background: var(--bad-light);
   color: #fca5a5;
   border: 1px solid rgba(239, 68, 68, 0.35);
-  box-shadow: 0 0 18px rgba(239, 68, 68, 0.12);
-  animation: fadeIn 0.3s ease;
 }
 .municipal-pill.active {
   background: var(--g-light);
   color: var(--g);
-  border-color: rgba(34, 211, 238, 0.35);
-  box-shadow: 0 0 18px rgba(34, 211, 238, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
 }
 .municipal-pill.ok {
   background: var(--ok-light);
   color: #86efac;
   border-color: rgba(34, 197, 94, 0.35);
-  box-shadow: 0 0 18px rgba(34, 197, 94, 0.12);
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-3px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 #gaugeSection {
-  margin-top: 18px;
-  padding-top: 18px;
+  margin-top: 14px;
+  padding-top: 14px;
   border-top: 1px solid var(--line);
 }
 #drawer.collapsed #gaugeSection { display: none; }
+#drawer.collapsed #sub { display: none; }
+#drawer.collapsed .municipal-pill { display: none !important; }
 
-/* Water-depth instrument: big reading + glowing bar filling toward the red 350 mm line */
+/* Water-depth gauge: clean matte technical instrument */
 #gauge .lab {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 12px;
-  margin-bottom: 30px;
+  gap: 10px;
+  margin-bottom: 22px;
 }
 #gauge .lab span {
   font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--label);
-  padding-bottom: 6px;
+  padding-bottom: 4px;
 }
 #gauge .lab b {
   color: var(--ink);
-  font-size: 44px;
+  font-size: 38px;
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 0.95;
   white-space: nowrap;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
-/* Reading colour follows the route status set by the app */
-#drawer:has(#status.warn) #gval { color: var(--warn); text-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
-#drawer:has(#status.bad) #gval { color: #ff5c5c; text-shadow: 0 0 24px rgba(239, 68, 68, 0.6); }
+#drawer:has(#status.warn) #gval { color: var(--warn); }
+#drawer:has(#status.bad) #gval { color: var(--bad); }
 #gbar {
   position: relative;
-  height: 20px;
-  border-radius: 10px;
-  /* faint red "danger zone" beyond the 350 mm line (350 / 500 = 70%) */
+  height: 14px;
+  border-radius: 6px;
   background:
-    linear-gradient(90deg, transparent 0 70%, rgba(239, 68, 68, 0.16) 70% 100%),
-    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(148, 163, 184, 0.08) calc(10% - 1px) 10%),
-    rgba(2, 6, 14, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.04);
+    linear-gradient(90deg, transparent 0 70%, rgba(239, 68, 68, 0.14) 70% 100%),
+    #11141a;
+  border: 1px solid var(--line);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
   overflow: visible;
 }
 #gfill {
@@ -603,80 +762,56 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
   top: 0;
   bottom: 0;
   width: 0%;
-  border-radius: 9px;
+  border-radius: 5px;
   background: var(--g);
   transition: width 0.3s ease, background 0.3s ease;
 }
-/* Glow that always matches the fill colour (inherits the app-set background) */
-#gfill::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  background: inherit;
-  filter: blur(10px);
-  opacity: 0.75;
-  z-index: -1;
-}
-/* Glass highlight on the top half of the fill */
-#gfill::after {
-  content: "";
-  position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 2px;
-  height: 40%;
-  border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+#gfill::before, #gfill::after {
+  display: none !important; /* No gloss or glow */
 }
 #gbar .mk {
   position: absolute;
-  top: -5px;
-  bottom: -5px;
+  top: -4px;
+  bottom: -4px;
   width: 2px;
   margin-left: -1px;
   border-radius: 1px;
-  background: rgba(148, 163, 184, 0.45);
+  background: #444c56;
   z-index: 2;
 }
 #gbar .mk.on {
   background: var(--ink);
-  box-shadow: 0 0 8px rgba(237, 242, 250, 0.7);
 }
-/* The 350 mm axle-drowning line: always bright red with a small tag */
+/* 350 mm axle-drowning threshold line */
 #gbar .mk[data-v="car"] {
-  top: -8px;
-  bottom: -8px;
-  width: 3px;
-  margin-left: -1.5px;
-  background: #ff4d4d;
-  box-shadow: 0 0 6px rgba(239, 68, 68, 0.9), 0 0 16px rgba(239, 68, 68, 0.6);
+  top: -6px;
+  bottom: -6px;
+  width: 2px;
+  margin-left: -1px;
+  background: #ef4444;
 }
 #gbar .mk[data-v="car"]::after {
   content: "350 mm";
   position: absolute;
-  bottom: calc(100% + 5px);
+  bottom: calc(100% + 4px);
   left: 50%;
   transform: translateX(-50%);
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: var(--r-pill);
-  background: var(--bad);
+  background: #991b1b;
+  border: 1px solid #ef4444;
   color: #fff;
-  font: 700 10px var(--font);
-  letter-spacing: 0.06em;
+  font: 700 9px var(--font);
+  letter-spacing: 0.05em;
   white-space: nowrap;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
-}
-#gbar .mk[data-v="car"].on {
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3), 0 0 8px rgba(239, 68, 68, 1), 0 0 20px rgba(239, 68, 68, 0.7);
 }
 #gticks {
   position: relative;
-  height: 16px;
-  font-size: 11px;
+  height: 14px;
+  font-size: 10.5px;
   font-weight: 500;
   color: var(--label);
-  margin-top: 10px;
+  margin-top: 8px;
 }
 #gticks span {
   position: absolute;
@@ -686,29 +821,27 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
 #gticks span:nth-child(2) { color: #f87171; font-weight: 700; }
 #gticks span:last-child { transform: translateX(-100%); }
 #note {
-  margin-top: 14px;
+  margin-top: 10px;
   font-size: 11px;
   color: var(--label);
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 /* ── Officer Emergency Dispatch Sheet ── */
 #officer {
   position: fixed;
-  left: 12px;
-  right: 12px;
-  bottom: calc(12px + var(--safe-bottom));
+  left: 14px;
+  right: 14px;
+  bottom: calc(14px + var(--safe-bottom));
   max-height: 80vh;
   overflow-y: auto;
   border-radius: var(--r-panel);
   border: 1px solid var(--line);
-  padding: 22px 22px 24px;
-  background: linear-gradient(180deg, rgba(20, 30, 49, 0.97) 0%, rgba(9, 14, 25, 0.98) 100%);
-  backdrop-filter: var(--glass);
-  -webkit-backdrop-filter: var(--glass);
-  box-shadow: var(--top-hi), var(--sh-lg);
+  padding: 20px 20px 22px;
+  background: #161b22;
+  box-shadow: var(--sh-lg);
   transform: translateY(calc(100% + 40px));
-  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 1500;
   max-width: 760px;
   margin: 0 auto;
@@ -720,35 +853,33 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .officer-header h2 {
   margin: 0;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.015em;
 }
 
-/* Cedar Verification Badge Banner (system status → accent colour) */
+/* Cedar Verification Badge */
 .cedar-badge-banner {
   border-radius: var(--r-inner);
-  padding: 12px 14px;
-  font-size: 11.5px;
+  padding: 10px 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 }
 .cedar-badge-banner.authorized {
-  background: linear-gradient(180deg, rgba(34, 211, 238, 0.14), rgba(34, 211, 238, 0.06));
-  color: var(--g);
-  border: 1px solid rgba(34, 211, 238, 0.45);
-  box-shadow: var(--top-hi), 0 0 24px rgba(34, 211, 238, 0.14);
-  text-shadow: 0 0 12px rgba(34, 211, 238, 0.45);
+  background: #182635;
+  color: #38bdf8;
+  border: 1px solid #388bfd;
 }
 .cedar-badge-banner.standby {
   background: var(--warn-light);
@@ -756,268 +887,181 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
   border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
-/* Live Pulsating Dispatch Order Status */
-@keyframes pulseAmber {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-  70% { transform: scale(1.1); box-shadow: 0 0 0 7px rgba(245, 158, 11, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-}
-@keyframes pulseGreen {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-  70% { transform: scale(1.1); box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-}
 .order-status {
   display: inline-flex;
   align-items: center;
-  padding: 6px 13px 6px 11px;
+  padding: 5px 11px;
   border-radius: var(--r-pill);
   font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 .order-status.pulsating-amber {
   background: var(--warn-light);
   color: #fbbf24;
   border: 1px solid rgba(245, 158, 11, 0.4);
 }
-.order-status.pulsating-amber .pulsing-dot {
-  background: var(--warn);
-  animation: pulseAmber 1.4s infinite;
-}
 .order-status.pulsating-green {
   background: var(--ok-light);
   color: #4ade80;
   border: 1px solid rgba(34, 197, 94, 0.4);
 }
-.order-status.pulsating-green .pulsing-dot {
-  background: var(--ok);
-  animation: pulseGreen 1.4s infinite;
-}
 .pulsing-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  margin-right: 8px;
+  margin-right: 7px;
   flex-shrink: 0;
 }
+.order-status.pulsating-amber .pulsing-dot { background: var(--warn); }
+.order-status.pulsating-green .pulsing-dot { background: var(--ok); }
 
-/* Dispatch queue cards: layered surface + glowing status edge */
+/* Dispatch Queue Cards */
 .card {
   position: relative;
   border: 1px solid var(--line);
   border-radius: var(--r-card);
-  padding: 20px 22px 20px 26px;
-  margin-bottom: 14px;
-  background: var(--surface-solid);
-  box-shadow: var(--top-hi), 0 12px 30px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+  padding: 16px 18px 16px 22px;
+  margin-bottom: 12px;
+  background: #1c2128;
 }
 .card::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 16px;
-  bottom: 16px;
+  top: 14px;
+  bottom: 14px;
   width: 3px;
-  border-radius: 0 3px 3px 0;
+  border-radius: 0 2px 2px 0;
   background: var(--line-hi);
 }
-.card:has(.chip.none)::before { background: var(--ok); box-shadow: 0 0 10px rgba(34, 197, 94, 0.8), 0 0 22px rgba(34, 197, 94, 0.35); }
-.card:has(.chip.stby)::before { background: var(--warn); box-shadow: 0 0 10px rgba(245, 158, 11, 0.8), 0 0 22px rgba(245, 158, 11, 0.35); }
-.card:has(.chip.go)::before { background: var(--bad); box-shadow: 0 0 10px rgba(239, 68, 68, 0.9), 0 0 22px rgba(239, 68, 68, 0.4); }
-.card:has(.chip.go) {
-  border-color: rgba(239, 68, 68, 0.28);
-  background: linear-gradient(90deg, rgba(239, 68, 68, 0.08), transparent 55%), var(--surface-solid);
-}
+.card:has(.chip.none)::before { background: var(--ok); }
+.card:has(.chip.stby)::before { background: var(--warn); }
+.card:has(.chip.go)::before { background: var(--bad); }
 .card b {
   display: block;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   color: var(--ink);
 }
 .card .meta {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 400;
-  color: #a7b5ca;
-  margin-top: 8px;
-  line-height: 1.6;
+  color: var(--sub);
+  margin-top: 6px;
+  line-height: 1.5;
 }
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  margin-top: 12px;
+  gap: 6px;
+  margin-top: 10px;
   margin-right: 6px;
-  padding: 6px 13px 6px 11px;
+  padding: 5px 11px;
   border-radius: var(--r-pill);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .chip::before {
   content: "";
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: currentColor;
-  box-shadow: 0 0 8px currentColor;
 }
 .chip:empty { display: none; }
-.chip.go { background: var(--bad-light); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.45); }
+.chip.go { background: var(--bad-light); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
 .chip.stby { background: var(--warn-light); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
 .chip.none { background: var(--ok-light); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
 .dispatch {
   display: block;
   width: 100%;
-  margin-top: 18px;
-  border: 1px solid rgba(255, 120, 120, 0.4);
+  margin-top: 14px;
+  border: 1px solid #ef4444;
   border-radius: var(--r-inner);
-  padding: 14px;
-  background: linear-gradient(180deg, #f25555 0%, #d42a2a 100%);
+  padding: 12px;
+  background: #b91c1c;
   color: #fff;
-  font: 700 14px var(--font);
-  letter-spacing: 0.03em;
+  font: 700 13px var(--font);
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: filter 0.2s, box-shadow 0.2s, transform 0.2s;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 8px 24px rgba(239, 68, 68, 0.35), 0 0 0 1px rgba(239, 68, 68, 0.2);
+  transition: background 0.15s;
 }
 .dispatch:hover:not(:disabled) {
-  filter: brightness(1.07);
-  transform: translateY(-1px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 12px 30px rgba(239, 68, 68, 0.45), 0 0 0 1px rgba(239, 68, 68, 0.3);
+  background: #dc2626;
 }
 .dispatch:disabled {
-  background: rgba(148, 163, 184, 0.08);
+  background: #21262d;
   border-color: var(--line);
-  color: #64748b;
+  color: #484f58;
   cursor: not-allowed;
-  box-shadow: none;
 }
-.hint { font-size: 12px; color: var(--label); margin-top: 10px; line-height: 1.45; }
+.hint { font-size: 11.5px; color: var(--label); margin-top: 8px; line-height: 1.4; }
 .hint:empty { display: none; }
 
-/* ── AWS Frugality Badge (Cleanly Floated Above Map Attribution) ── */
+/* ── AWS Architecture Badge ── */
 #badge {
   position: fixed;
   z-index: 999;
   right: 10px;
   bottom: calc(26px + var(--safe-bottom));
-  background: var(--surface);
-  backdrop-filter: var(--glass);
-  -webkit-backdrop-filter: var(--glass);
+  background: #161b22;
   border: 1px solid var(--line);
   border-radius: var(--r-pill);
-  padding: 5px 12px;
-  font-size: 10.5px;
+  padding: 4px 10px;
+  font-size: 10px;
   color: var(--sub);
-  box-shadow: var(--top-hi), var(--sh-sm);
   pointer-events: none;
 }
 
-/* Leaflet elements */
+/* Map Overlays */
 .hazard-icon {
-  background: var(--bad);
+  background: #ef4444;
   color: #fff;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
+  font-size: 15px;
   border: 2px solid #fff;
-  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.3), 0 0 18px rgba(239, 68, 68, 0.8);
 }
 .leaflet-tooltip.lbl {
-  background: rgba(17, 26, 44, 0.94);
+  background: #161b22;
   color: var(--ink);
-  border: 1px solid var(--line-hi);
-  border-radius: 8px;
-  padding: 4px 9px;
-  font: 600 11.5px var(--font);
-  box-shadow: var(--top-hi), var(--sh-sm);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font: 600 11px var(--font);
+  box-shadow: var(--sh-sm);
 }
-.leaflet-tooltip-left.lbl::before { border-left-color: rgba(17, 26, 44, 0.94); }
-.leaflet-tooltip-right.lbl::before { border-right-color: rgba(17, 26, 44, 0.94); }
-.leaflet-tooltip-top.lbl::before { border-top-color: rgba(17, 26, 44, 0.94); }
-.leaflet-tooltip-bottom.lbl::before { border-bottom-color: rgba(17, 26, 44, 0.94); }
+.leaflet-tooltip-left.lbl::before { border-left-color: #161b22; }
+.leaflet-tooltip-right.lbl::before { border-right-color: #161b22; }
+.leaflet-tooltip-top.lbl::before { border-top-color: #161b22; }
+.leaflet-tooltip-bottom.lbl::before { border-bottom-color: #161b22; }
 .leaflet-control-zoom { display: none; }
 
-/* ── Responsive Mobile Sizing ── */
-@media (max-width: 600px) {
-  #top { left: 8px; right: 8px; top: max(8px, var(--safe-top)); gap: 6px; padding: 6px; border-radius: 20px; }
-  .tier-1 { gap: 6px; }
-  #pill { height: 40px; padding: 4px 4px 4px 12px; gap: 8px; }
-  #pill .route-title { font-size: 12.5px; }
-  #changeBtn { height: 30px; padding: 0 10px; font-size: 10px; }
-  #officerBtn { padding: 0 12px; font-size: 12px; height: 40px; }
-  .tier-2 { gap: 6px; flex-wrap: wrap; }
-  .segmented-group { padding: 3px; flex: 1 1 auto; }
-  .segmented-group button { flex: 1; padding: 7px 8px; font-size: 11px; }
-  #drawer { left: 8px; right: 8px; bottom: calc(8px + var(--safe-bottom)); border-radius: 20px; padding: 8px 18px 16px; }
-  #officer { left: 8px; right: 8px; bottom: calc(8px + var(--safe-bottom)); border-radius: 20px; padding: 18px 14px 18px; }
-  #status { font-size: 18px; }
-  #sub { font-size: 12.5px; }
-  #gaugeSection { margin-top: 14px; padding-top: 14px; }
-  #gauge .lab b { font-size: 34px; }
-  .card { padding: 16px 16px 16px 20px; }
-  .card b { font-size: 16px; }
-  #badge { font-size: 9.5px; padding: 3px 8px; bottom: calc(22px + var(--safe-bottom)); }
-}
-@media (max-width: 400px) {
-  .segmented-group button { padding: 7px 6px; font-size: 10.5px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  #officer, #toast, #drawer { transition: none; }
-  #pill .dot { animation: none; }
-  .pulsating-amber .pulsing-dot, .pulsating-green .pulsing-dot { animation: none; }
-}
-
-/* ══ Phase 6: Dry-Season Water Supply (drought view) ══════════════════════ */
-#waterBtn {
-  flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.035);
-  border-radius: var(--r-pill);
-  padding: 0 18px;
-  border: 1px solid var(--line);
-  color: var(--ink);
-  font: 600 13px var(--font);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-  height: 46px;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
-}
-#waterBtn:hover { border-color: var(--line-hi); background: rgba(255, 255, 255, 0.06); transform: translateY(-1px); }
-#waterBtn[aria-pressed=true] {
-  background: linear-gradient(180deg, #4ee3f5, var(--g));
-  color: var(--g-ink);
-  font-weight: 700;
-  border-color: transparent;
-  box-shadow: var(--g-glow);
-}
+/* ══ Phase 6: Dry-Season Water Supply Sheet ══════════════════════ */
 #water {
   position: fixed;
-  left: 12px;
-  right: 12px;
-  bottom: calc(12px + var(--safe-bottom));
+  left: 14px;
+  right: 14px;
+  bottom: calc(14px + var(--safe-bottom));
   max-height: 80vh;
   overflow-y: auto;
   border-radius: var(--r-panel);
   border: 1px solid var(--line);
-  padding: 22px 22px 24px;
-  background: linear-gradient(180deg, rgba(20, 30, 49, 0.97) 0%, rgba(9, 14, 25, 0.98) 100%);
-  backdrop-filter: var(--glass);
-  -webkit-backdrop-filter: var(--glass);
-  box-shadow: var(--top-hi), var(--sh-lg);
+  padding: 20px 20px 22px;
+  background: #161b22;
+  box-shadow: var(--sh-lg);
   transform: translateY(calc(100% + 40px));
-  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 1500;
   max-width: 760px;
   margin: 0 auto;
@@ -1027,82 +1071,79 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
 #water.open { transform: translateY(0); }
 .offline-banner {
   border-radius: var(--r-inner);
-  padding: 10px 14px;
-  font-size: 10.5px;
+  padding: 8px 12px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   color: var(--sub);
-  background: rgba(148, 163, 184, 0.07);
-  border: 1px dashed var(--line-hi);
+  background: #12151c;
+  border: 1px dashed var(--line);
 }
 .w-label {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--label);
 }
 .day-panel {
   border: 1px solid var(--line);
   border-radius: var(--r-card);
-  padding: 16px 20px 14px;
-  margin-bottom: 14px;
-  background: var(--surface-solid);
-  box-shadow: var(--top-hi), 0 12px 30px rgba(0, 0, 0, 0.4);
+  padding: 14px 18px 12px;
+  margin-bottom: 12px;
+  background: #1c2128;
 }
 .day-head {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 .day-big {
-  font-size: 30px;
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   line-height: 1.05;
-  margin-top: 4px;
+  margin-top: 3px;
 }
-.day-meta { text-align: right; font-size: 12.5px; color: var(--sub); line-height: 1.5; }
-.day-meta b { color: var(--ink); font-weight: 700; font-size: 14px; }
+.day-meta { text-align: right; font-size: 12px; color: var(--sub); line-height: 1.4; }
+.day-meta b { color: var(--ink); font-weight: 700; font-size: 13.5px; }
 #wSlider {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 10px;
+  height: 8px;
   margin: 0;
-  border-radius: 5px;
+  border-radius: 4px;
   background:
     linear-gradient(90deg, var(--g) 0 var(--fill, 0%), transparent var(--fill, 0%)),
-    rgba(2, 6, 14, 0.75);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(148, 163, 184, 0.12);
+    #12151c;
+  border: 1px solid var(--line);
   cursor: pointer;
 }
 #wSlider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: #eafcff;
-  border: 3px solid var(--g);
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.7);
+  background: #f0f6fc;
+  border: 2px solid var(--g);
 }
 #wSlider::-moz-range-thumb {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #eafcff;
-  border: 3px solid var(--g);
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.7);
+  background: #f0f6fc;
+  border: 2px solid var(--g);
 }
 .day-ticks {
   position: relative;
-  height: 16px;
-  margin-top: 10px;
-  font-size: 10.5px;
+  height: 14px;
+  margin-top: 8px;
+  font-size: 10px;
   color: var(--label);
 }
 .day-ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
@@ -1110,9 +1151,9 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
 .day-ticks span:last-child { transform: translateX(-100%); }
 .w-summary {
   border-radius: var(--r-inner);
-  padding: 11px 14px;
-  margin-bottom: 14px;
-  font-size: 13px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -1120,143 +1161,166 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
 }
 .w-summary.ok { background: var(--ok-light); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.35); }
 .w-summary.warn { background: var(--warn-light); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
-.w-summary.bad {
-  background: var(--bad-light);
-  color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, 0.45);
-  box-shadow: 0 0 22px rgba(239, 68, 68, 0.18);
-}
+.w-summary.bad { background: var(--bad-light); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.45); }
 .w-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
 }
-.w-area { font-size: 12px; color: var(--sub); margin-top: 3px; }
+.w-area { font-size: 11.5px; color: var(--sub); margin-top: 2px; }
 .w-pct {
   text-align: right;
-  font-size: 34px;
+  font-size: 30px;
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;
   white-space: nowrap;
 }
-.w-pct small { display: block; margin-top: 6px; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--label); }
+.w-pct small { display: block; margin-top: 4px; font-size: 9.5px; font-weight: 600; letter-spacing: 0.1em; color: var(--label); }
 .w-pct.ok { color: var(--ink); }
-.w-pct.warn { color: var(--warn); text-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
-.w-pct.bad { color: #ff5c5c; text-shadow: 0 0 24px rgba(239, 68, 68, 0.6); }
+.w-pct.warn { color: var(--warn); }
+.w-pct.bad { color: var(--bad); }
 .wbar {
   position: relative;
-  height: 14px;
-  margin: 26px 0 8px;
-  border-radius: 7px;
+  height: 12px;
+  margin: 22px 0 8px;
+  border-radius: 6px;
   background:
     linear-gradient(90deg, rgba(239, 68, 68, 0.16) 0 80%, rgba(245, 158, 11, 0.1) 80% 90%, transparent 90%),
-    rgba(2, 6, 14, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.7);
+    #12151c;
+  border: 1px solid var(--line);
 }
 .wfill {
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
-  border-radius: 6px;
+  border-radius: 5px;
   transition: width 0.25s ease, background 0.25s ease;
 }
-.wfill.ok { background: var(--ok); box-shadow: 0 0 14px rgba(34, 197, 94, 0.5); }
-.wfill.warn { background: var(--warn); box-shadow: 0 0 14px rgba(245, 158, 11, 0.5); }
-.wfill.bad { background: var(--bad); box-shadow: 0 0 16px rgba(239, 68, 68, 0.65); }
-.wfill::after {
-  content: "";
-  position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 2px;
-  height: 40%;
-  border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0));
-}
+.wfill.ok { background: var(--ok); }
+.wfill.warn { background: var(--warn); }
+.wfill.bad { background: var(--bad); }
 .wline {
   position: absolute;
-  top: -7px;
-  bottom: -7px;
-  width: 3px;
-  margin-left: -1.5px;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  margin-left: -1px;
   left: 80%;
-  background: #ff4d4d;
-  box-shadow: 0 0 6px rgba(239, 68, 68, 0.9), 0 0 16px rgba(239, 68, 68, 0.6);
+  background: #ef4444;
   z-index: 2;
 }
 .wline::after {
   content: "SAFE LINE 80%";
   position: absolute;
-  bottom: calc(100% + 4px);
+  bottom: calc(100% + 3px);
   left: 50%;
   transform: translateX(-50%);
-  padding: 2px 7px;
+  padding: 1px 6px;
   border-radius: var(--r-pill);
-  background: var(--bad);
+  background: #991b1b;
+  border: 1px solid #ef4444;
   color: #fff;
-  font: 700 9px var(--font);
-  letter-spacing: 0.06em;
+  font: 700 8.5px var(--font);
+  letter-spacing: 0.05em;
   white-space: nowrap;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
 }
 .w-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 12px;
 }
 .w-stat {
   border-radius: var(--r-inner);
-  padding: 10px 12px;
-  background: rgba(2, 6, 14, 0.35);
+  padding: 8px 10px;
+  background: #12151c;
   border: 1px solid var(--line);
 }
-.w-stat .v { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; margin-top: 5px; }
-.w-stat .s { font-size: 11px; color: var(--sub); margin-top: 2px; }
-.w-stat .v.bad { color: #ff5c5c; text-shadow: 0 0 16px rgba(239, 68, 68, 0.5); }
+.w-stat .v { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; margin-top: 4px; }
+.w-stat .s { font-size: 10.5px; color: var(--sub); margin-top: 2px; }
+.w-stat .v.bad { color: var(--bad); }
+
+/* ── Desktop Docking Layout (Eliminates Center Cluttering) ── */
+@media (min-width: 900px) {
+  #top {
+    left: 20px;
+    right: auto;
+    top: max(20px, var(--safe-top));
+    width: 440px;
+    max-width: 440px;
+    margin: 0;
+  }
+  #drawer {
+    left: 20px;
+    right: auto;
+    bottom: calc(20px + var(--safe-bottom));
+    width: 440px;
+    max-width: 440px;
+    margin: 0;
+  }
+  #officer, #water {
+    left: 20px;
+    right: auto;
+    top: max(20px, var(--safe-top));
+    bottom: calc(20px + var(--safe-bottom));
+    width: 460px;
+    max-width: 460px;
+    margin: 0;
+    max-height: calc(100vh - 40px);
+    transform: translateX(calc(-100% - 40px));
+  }
+  #officer.open, #water.open {
+    transform: translateX(0);
+  }
+}
+
+/* ── Mobile Layout ── */
 @media (max-width: 600px) {
-  #waterBtn { padding: 0 12px; height: 40px; }
-  #waterBtn .wb-label { display: none; }
-  #water { left: 8px; right: 8px; bottom: calc(8px + var(--safe-bottom)); border-radius: 20px; padding: 18px 14px 18px; }
-  .day-panel { padding: 14px 14px 12px; }
-  .day-big { font-size: 24px; }
-  .w-pct { font-size: 28px; }
-  .w-stats { gap: 6px; }
-  .w-stat { padding: 8px 9px; }
-  .w-stat .v { font-size: 14px; }
+  #top { left: 8px; right: 8px; top: max(8px, var(--safe-top)); gap: 6px; padding: 6px; border-radius: 12px; }
+  .tier-1 { gap: 6px; }
+  #pill { height: 38px; padding: 4px 4px 4px 10px; gap: 8px; }
+  #pill .route-title { font-size: 12px; }
+  #changeBtn { height: 28px; padding: 0 10px; font-size: 10px; }
+  .tier-2 { gap: 6px; flex-wrap: wrap; }
+  .segmented-group { padding: 2px; flex: 1 1 auto; }
+  .segmented-group button { flex: 1; padding: 6px 6px; font-size: 11px; }
+  .tier-3 button { height: 34px; font-size: 11px; }
+  #drawer { left: 8px; right: 8px; bottom: calc(8px + var(--safe-bottom)); border-radius: 12px; padding: 10px 14px 14px; }
+  #officer, #water { left: 8px; right: 8px; bottom: calc(8px + var(--safe-bottom)); border-radius: 12px; padding: 16px 14px 16px; }
+  #status { font-size: 17px; }
+  #sub { font-size: 12px; }
+  #gauge .lab b { font-size: 30px; }
+  #badge { font-size: 9px; padding: 3px 7px; bottom: calc(22px + var(--safe-bottom)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  #water { transition: none; }
+  #officer, #water, #toast, #drawer { transition: none; }
 }
 </style>
 </head>
 <body>
 <div id="map" role="application" aria-label="Interactive map of Delhi"></div>
 
-<!-- Top Floating Navigation (Two Balanced Tiers) -->
+<!-- Interactive Map Route Pick Banner -->
+<div id="mapPickBanner" class="map-pick-banner" style="display: none;">
+  <span id="mapPickText">📍 Step 1: Click anywhere on map to set Origin (Point A)</span>
+  <button type="button" id="cancelPickBtn">Cancel</button>
+</div>
+
+<!-- Top Command Navigation Dock -->
 <div id="top">
-  <!-- Tier 1: Primary Navigation -->
+  <!-- Tier 1: Primary Corridor Selector -->
   <div class="tier-1">
     <div id="pill" role="button" tabindex="0" aria-label="Selected route. Click to customize.">
       <span class="dot"></span>
       <span class="route-title" id="pillTitle">Kashmere Gate ISBT ➔ Rohini Sector 14</span>
-      <button id="changeBtn" aria-label="Change route corridor">Change</button>
+      <button type="button" id="changeBtn" aria-label="Change route corridor">Route</button>
     </div>
-    <button id="officerBtn" aria-pressed="false" aria-controls="officer">
-      <span>👷</span>
-      <span>Officer View</span>
-    </button>
-    <button id="waterBtn" aria-pressed="false" aria-controls="water" aria-label="Dry-season water supply">
-      <span>💧</span>
-      <span class="wb-label">Water Supply</span>
-    </button>
   </div>
 
-  <!-- Tier 2: Controls -->
+  <!-- Tier 2: Vehicle Clearance & Weather Simulation Controls -->
   <div class="tier-2">
     <div id="veh" class="segmented-group" role="group" aria-label="Vehicle clearance">
       <button data-v="two" aria-pressed="false">🛵 20cm</button>
@@ -1269,23 +1333,84 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
       <button data-s="cloudburst" aria-pressed="false">⛈️ Cloudburst</button>
     </div>
   </div>
+
+  <!-- Tier 3: Officer View & Water Supply Actions -->
+  <div class="tier-3">
+    <button type="button" id="officerBtn" aria-pressed="false" aria-controls="officer">
+      <span>👷</span>
+      <span>Officer View</span>
+    </button>
+    <button type="button" id="waterBtn" aria-pressed="false" aria-controls="water" aria-label="Dry-season water supply">
+      <span>💧</span>
+      <span class="wb-label">Water Supply</span>
+    </button>
+  </div>
 </div>
 
-<!-- Route Switcher Modal (3 Pre-configured High-Risk Corridors) -->
-<div id="routeModal" role="dialog" aria-modal="true" aria-label="Switch Delhi Corridor">
+<!-- Route & Corridor Switcher Dialog (Preset Corridors + Custom Delhi Route Planner) -->
+<div id="routeModal" role="dialog" aria-modal="true" aria-label="Select Corridor or Route">
   <div class="modal-box">
     <div class="modal-head">
-      <h3>Switch Delhi Corridor</h3>
-      <button class="modal-close" id="closeModalBtn" aria-label="Close dialog">✕</button>
+      <h3>Select Corridor or Route</h3>
+      <button type="button" class="modal-close" id="closeModalBtn" aria-label="Close dialog">✕</button>
     </div>
-    <div class="modal-subtitle">Select a monitored high-risk underpass route in Delhi NCT:</div>
-    <div class="corridor-list" id="corridorList">
-      <!-- Generated via JS -->
+
+    <!-- Navigation Tabs -->
+    <div class="modal-tabs" role="tablist">
+      <button type="button" class="modal-tab active" id="tabPredefined" role="tab" aria-selected="true">Monitored Corridors</button>
+      <button type="button" class="modal-tab" id="tabCustom" role="tab" aria-selected="false">Custom Route</button>
+    </div>
+
+    <!-- Tab 1: Monitored Corridors -->
+    <div id="predefinedView">
+      <div class="modal-subtitle">Monitored depression underpasses in Delhi NCT:</div>
+      <div class="corridor-list" id="corridorList">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- Tab 2: Custom Route Planner -->
+    <div id="customView" style="display: none;">
+      <div class="modal-subtitle">Set any custom trip in Delhi and assess depression flood risk:</div>
+      
+      <div class="custom-inputs">
+        <div class="input-row">
+          <label for="customOrigin">Origin (A)</label>
+          <div class="select-wrap">
+            <select id="customOrigin" aria-label="Origin landmark"></select>
+          </div>
+        </div>
+
+        <div class="swap-row">
+          <button type="button" id="swapPointsBtn" class="swap-btn" title="Swap endpoints">⇅ Swap Endpoints</button>
+        </div>
+
+        <div class="input-row">
+          <label for="customDest">Destination (B)</label>
+          <div class="select-wrap">
+            <select id="customDest" aria-label="Destination landmark"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="custom-tools">
+        <button type="button" id="pickMapBtn" class="pick-map-btn">
+          <span>📍</span>
+          <span>Click on Map to Set Route</span>
+        </button>
+      </div>
+
+      <div class="sink-detect-card" id="sinkDetectCard">
+        <div class="detect-title" id="detectTitle">Analyzing topographical corridor…</div>
+        <div class="detect-detail" id="detectDetail">Testing proximity to Copernicus DEM depression sinks.</div>
+      </div>
+
+      <button type="button" id="applyCustomBtn" class="apply-btn">Apply Custom Route</button>
     </div>
   </div>
 </div>
 
-<!-- Bottom Navigation Sheet / Commuter Card -->
+<!-- Commuter Navigation Card / Water Gauge -->
 <div id="drawer" role="region" aria-live="polite">
   <div class="handle-bar" id="drawerHandle" title="Toggle detailed water gauge"></div>
   <div class="drawer-header" id="drawerToggle">
@@ -1315,7 +1440,7 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
 <div id="officer" role="region" aria-label="Municipal Dewatering Dispatch">
   <div class="officer-header">
     <h2>Municipal Dewatering Command</h2>
-    <button class="modal-close" id="closeOfficerBtn" aria-label="Close officer sheet">✕</button>
+    <button type="button" class="modal-close" id="closeOfficerBtn" aria-label="Close officer sheet">✕</button>
   </div>
 
   <!-- Cedar Verification Badge -->
@@ -1327,11 +1452,11 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
   <div id="cards"></div>
 </div>
 
-<!-- Phase 6: Dry-Season Water Supply Sheet (drought view, model: drought.py) -->
+<!-- Phase 6: Dry-Season Water Supply Sheet -->
 <div id="water" role="region" aria-label="Dry-season water supply">
   <div class="officer-header">
     <h2>Dry-Season Water Supply</h2>
-    <button class="modal-close" id="closeWaterBtn" aria-label="Close water supply sheet">✕</button>
+    <button type="button" class="modal-close" id="closeWaterBtn" aria-label="Close water supply sheet">✕</button>
   </div>
   <div class="offline-banner">PREPARED OFFLINE · ILLUSTRATIVE ESTIMATES · NOT LIVE DATA</div>
 
@@ -1357,19 +1482,19 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
 
   <div class="w-summary ok" id="wSummary" role="status" aria-live="polite"></div>
   <div id="wCards"></div>
-  <div class="hint">Model: drought.py · need = people × 135 L/day (CPHEEO norm) · supply = piped + borewells (borewells shrink as the water table falls) · tanker = 10,000 L, enough to lift supply back to the 80% safe line.</div>
+  <div class="hint">Model: drought.py · need = people × 135 L/day (CPHEEO norm) · supply = piped + borewells · tanker = 10,000 L, enough to lift supply back to the 80% safe line.</div>
 </div>
 
 <!-- Floating Top SNS Civic Dispatch Notification -->
 <div id="toast" role="status" aria-live="polite" hidden>
   <div class="toast-header">
     <span class="toast-tag">📩 Amazon SNS Civic Alert Fired</span>
-    <button class="toast-close" id="toastCloseBtn" aria-label="Dismiss alert">✕</button>
+    <button type="button" class="toast-close" id="toastCloseBtn" aria-label="Dismiss alert">✕</button>
   </div>
   <div class="msg" id="toastMsg">MCD Ward Control Room notified. Cedar Policy verified 40 HP pump requirement.</div>
 </div>
 
-<!-- AWS Frugality Badge -->
+<!-- AWS Serverless Badge -->
 <div id="badge">☁️ AWS Serverless Architecture • Free Tier • $0.00 Idle Cost</div>
 
 <script>
@@ -1423,7 +1548,8 @@ const CORRIDORS = [
     bypassRoute: [[28.6675, 77.2285], [28.6750, 77.2000], [28.6820, 77.1700], [28.6950, 77.1450], [28.7150, 77.1150]],
     normalMin: 26,
     detourMin: 7,
-    bypassVia: "Outer Ring Rd"
+    bypassVia: "Outer Ring Rd",
+    isCustom: false
   },
   {
     id: "minto",
@@ -1439,7 +1565,8 @@ const CORRIDORS = [
     bypassRoute: BYPASS,
     normalMin: 22,
     detourMin: 4,
-    bypassVia: "Barakhamba Rd"
+    bypassVia: "Barakhamba Rd",
+    isCustom: false
   },
   {
     id: "prahladpur",
@@ -1455,8 +1582,28 @@ const CORRIDORS = [
     bypassRoute: [[28.5020, 77.3050], [28.5140, 77.2980], [28.5280, 77.2650], [28.5350, 77.2300], [28.5245, 77.2066]],
     normalMin: 28,
     detourMin: 8,
-    bypassVia: "Maa Anandmayee Marg"
+    bypassVia: "Maa Anandmayee Marg",
+    isCustom: false
   }
+];
+
+// Major Delhi NCT Transportation Hubs & Landmarks for Custom Routing
+const DELHI_HUBS = [
+  { name: "Kashmere Gate ISBT", ll: [28.6675, 77.2285], zone: "North" },
+  { name: "Rohini Sector 14", ll: [28.7150, 77.1150], zone: "North-West" },
+  { name: "Connaught Place", ll: [28.6315, 77.2167], zone: "Central" },
+  { name: "Lajpat Nagar", ll: [28.5677, 77.2433], zone: "South-East" },
+  { name: "Badarpur Border", ll: [28.5020, 77.3050], zone: "South-East" },
+  { name: "Saket (District Centre)", ll: [28.5245, 77.2066], zone: "South" },
+  { name: "Karol Bagh", ll: [28.6515, 77.1900], zone: "Central-West" },
+  { name: "New Delhi Rly Station", ll: [28.6425, 77.2205], zone: "Central" },
+  { name: "Dwarka Sector 21", ll: [28.5520, 77.0580], zone: "South-West" },
+  { name: "IGI Airport (T3)", ll: [28.5560, 77.0855], zone: "South-West" },
+  { name: "AIIMS New Delhi", ll: [28.5672, 77.2100], zone: "South" },
+  { name: "Anand Vihar ISBT", ll: [28.6465, 77.3160], zone: "East" },
+  { name: "Pitampura", ll: [28.6990, 77.1385], zone: "North-West" },
+  { name: "Janakpuri", ll: [28.6295, 77.0820], zone: "West" },
+  { name: "Civil Lines", ll: [28.6810, 77.2230], zone: "North" }
 ];
 
 let activeCorridor = CORRIDORS[0]; // Default: Kashmere Gate to Rohini (Option 1)
@@ -1487,7 +1634,112 @@ async function fetchSink(s, rain){
   } finally { clearTimeout(t); }
 }
 
-// ── Map Setup (Clean Esri Street Map Tiles) ──────────────────────────────────
+// ── Topographical Corridor Proximity Engine ──────────────────────────────────
+// Determines perpendicular distance (in km) from a depression sink to a corridor segment
+function pointToSegmentDistanceKm(p, a, b) {
+  const dLat = (b[0] - a[0]) * 111.0;
+  const dLon = (b[1] - a[1]) * 97.4;
+  const len2 = dLat * dLat + dLon * dLon;
+  if (len2 === 0) {
+    const dy = (p[0] - a[0]) * 111.0, dx = (p[1] - a[1]) * 97.4;
+    return Math.sqrt(dy * dy + dx * dx);
+  }
+  const t = Math.max(0, Math.min(1, (((p[0] - a[0]) * 111.0) * dLat + ((p[1] - a[1]) * 97.4) * dLon) / len2));
+  const projY = (a[0] * 111.0) + t * dLat;
+  const projX = (a[1] * 97.4) + t * dLon;
+  const dy = (p[0] * 111.0) - projY;
+  const dx = (p[1] * 97.4) - projX;
+  return Math.sqrt(dy * dy + dx * dx);
+}
+
+function detectSinkForCorridor(originLL, destLL) {
+  let bestSinkIdx = null;
+  let minScore = 999;
+
+  SINKS.forEach((s, idx) => {
+    const distToSeg = pointToSegmentDistanceKm(s.ll, originLL, destLL);
+    const minLat = Math.min(originLL[0], destLL[0]) - 0.02;
+    const maxLat = Math.max(originLL[0], destLL[0]) + 0.02;
+    const minLon = Math.min(originLL[1], destLL[1]) - 0.02;
+    const maxLon = Math.max(originLL[1], destLL[1]) + 0.02;
+    const inBox = s.ll[0] >= minLat && s.ll[0] <= maxLat && s.ll[1] >= minLon && s.ll[1] <= maxLon;
+
+    if (distToSeg < 3.8 || (inBox && distToSeg < 6.8)) {
+      if (distToSeg < minScore) {
+        minScore = distToSeg;
+        bestSinkIdx = idx;
+      }
+    }
+  });
+
+  return bestSinkIdx;
+}
+
+function buildCustomCorridor(originLL, destLL, originName, destName) {
+  const closestSinkIdx = detectSinkForCorridor(originLL, destLL);
+  const distDirectKm = Math.round(Math.hypot((destLL[0] - originLL[0]) * 111.0, (destLL[1] - originLL[1]) * 97.4));
+  const normalMin = Math.max(12, Math.round(distDirectKm * 2.2));
+
+  let mainRoute = [];
+  let bypassRoute = null;
+  let detourMin = 6;
+  let bypassVia = "Alternate Arterial";
+  let sinkName = "None";
+  let sub = "Custom Delhi NCT Corridor";
+
+  if (closestSinkIdx === 0) {
+    // Minto Bridge corridor
+    sinkName = "Minto Bridge";
+    sub = `via Minto Bridge (${SINKS[0].id})`;
+    mainRoute = [originLL, [28.6336, 77.2172], destLL];
+    bypassRoute = [originLL, [28.6304, 77.2209], [28.6289, 77.2254], [28.6258, 77.2340], destLL];
+    detourMin = 4;
+    bypassVia = "Barakhamba Rd";
+  } else if (closestSinkIdx === 1) {
+    // Pul Prahladpur corridor
+    sinkName = "Pul Prahladpur Underpass";
+    sub = `via Pul Prahladpur Underpass (${SINKS[1].id})`;
+    mainRoute = [originLL, [28.4977, 77.2947], destLL];
+    bypassRoute = [originLL, [28.5140, 77.2980], [28.5280, 77.2650], destLL];
+    detourMin = 8;
+    bypassVia = "Maa Anandmayee Marg";
+  } else if (closestSinkIdx === 2) {
+    // Zakhira Underpass corridor
+    sinkName = "Zakhira Underpass";
+    sub = `via Zakhira Underpass (${SINKS[2].id})`;
+    mainRoute = [originLL, [28.6590, 77.1680], destLL];
+    bypassRoute = [originLL, [28.6750, 77.2000], [28.6820, 77.1700], destLL];
+    detourMin = 7;
+    bypassVia = "Outer Ring Rd";
+  } else {
+    // No monitored sink on path
+    sinkName = "None";
+    sub = "Direct corridor — No monitored sinks";
+    const midPoint = [(originLL[0] + destLL[0]) / 2, (originLL[1] + destLL[1]) / 2];
+    mainRoute = [originLL, midPoint, destLL];
+    bypassRoute = null;
+  }
+
+  return {
+    id: "custom_" + Date.now(),
+    name: `${originName} ➔ ${destName}`,
+    sub: sub,
+    sinkName: sinkName,
+    originName: originName,
+    destName: destName,
+    originLL: originLL,
+    destLL: destLL,
+    sinkIdx: closestSinkIdx,
+    mainRoute: mainRoute,
+    bypassRoute: bypassRoute,
+    normalMin: normalMin,
+    detourMin: detourMin,
+    bypassVia: bypassVia,
+    isCustom: true
+  };
+}
+
+// ── Map Setup (Clean Dark Esri Street Map Tiles) ──────────────────────────────
 const map = L.map("map", {zoomControl: false, attributionControl: true}).setView([28.60, 77.23], 12);
 L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
   maxZoom: 19,
@@ -1495,12 +1747,26 @@ L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_M
 }).addTo(map);
 
 const layer = L.layerGroup().addTo(map);
-const pin = (ll, color) => L.circleMarker(ll, {radius: 7, color: "#fff", weight: 3, fillColor: color, fillOpacity: 1});
+const pin = (ll, color) => L.circleMarker(ll, {
+  radius: 6,
+  color: "#ffffff",
+  weight: 2,
+  fillColor: color,
+  fillOpacity: 1
+});
 
+// Fit map route bounds with left padding compensation on desktop
 function fitCurrentRoute() {
-  const currentSink = SINKS[activeCorridor.sinkIdx];
-  const bounds = L.latLngBounds([activeCorridor.originLL, activeCorridor.destLL, currentSink.ll]);
-  map.fitBounds(bounds, {paddingTopLeft: [50, 160], paddingBottomRight: [50, 230]});
+  const pts = [activeCorridor.originLL, activeCorridor.destLL];
+  if (activeCorridor.sinkIdx !== null && SINKS[activeCorridor.sinkIdx]) {
+    pts.push(SINKS[activeCorridor.sinkIdx].ll);
+  }
+  const bounds = L.latLngBounds(pts);
+  const isDesktop = window.innerWidth >= 900;
+  map.fitBounds(bounds, {
+    paddingTopLeft: [isDesktop ? 480 : 25, isDesktop ? 40 : 160],
+    paddingBottomRight: [40, isDesktop ? 50 : 220]
+  });
 }
 fitCurrentRoute();
 
@@ -1538,8 +1804,8 @@ function sinkView(i){
 let mapSig = "";
 function drawMap(views){
   const activeSinkIdx = activeCorridor.sinkIdx;
-  const isRerouted = activeSinkIdx !== null ? views[activeSinkIdx].blocked : false;
-  const sig = activeCorridor.id + "|" + isRerouted + "|" + views.map(v => v.blocked).join(",");
+  const isRerouted = (activeSinkIdx !== null && views[activeSinkIdx]) ? views[activeSinkIdx].blocked : false;
+  const sig = activeCorridor.id + "|" + isRerouted + "|" + views.map(v => v.blocked).join(",") + "|" + JSON.stringify(activeCorridor.originLL);
   if (sig === mapSig) return;
   mapSig = sig;
 
@@ -1547,10 +1813,10 @@ function drawMap(views){
 
   // Draw main route (greyed/dashed if rerouted)
   L.polyline(activeCorridor.mainRoute, {
-    color: isRerouted ? "#9aa0a6" : "#1a73e8",
-    weight: isRerouted ? 5 : 7,
-    opacity: isRerouted ? 0.7 : 1,
-    dashArray: isRerouted ? "2 10" : null,
+    color: isRerouted ? "#6e7681" : "#2563eb",
+    weight: isRerouted ? 4 : 6,
+    opacity: isRerouted ? 0.65 : 1,
+    dashArray: isRerouted ? "3 8" : null,
     lineCap: "round"
   }).addTo(layer);
 
@@ -1558,13 +1824,13 @@ function drawMap(views){
   if (isRerouted && activeCorridor.bypassRoute) {
     L.polyline(activeCorridor.bypassRoute, {
       color: "#188038",
-      weight: 7,
+      weight: 6,
       lineCap: "round"
     }).addTo(layer);
   }
 
   // Draw Origin & Destination pins
-  pin(activeCorridor.originLL, "#1a73e8").addTo(layer)
+  pin(activeCorridor.originLL, "#2563eb").addTo(layer)
     .bindTooltip(activeCorridor.originName, {permanent: true, direction: "left", className: "lbl"});
   pin(activeCorridor.destLL, "#d93025").addTo(layer)
     .bindTooltip(activeCorridor.destName, {permanent: true, direction: "bottom", className: "lbl"});
@@ -1575,17 +1841,17 @@ function drawMap(views){
     L.circle(v.s.ll, {
       radius:260,
       color: "#d93025",
-      weight: 2,
+      weight: 1.5,
       fillColor: "#d93025",
-      fillOpacity: 0.35
+      fillOpacity: 0.3
     }).addTo(layer);
 
     L.marker(v.s.ll, {
       icon: L.divIcon({
         className: "",
         html: '<div class="hazard-icon">⚠</div>',
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
       })
     }).addTo(layer).bindTooltip(v.s.name, {direction: "right", className: "lbl"});
   });
@@ -1612,52 +1878,66 @@ function buildGauge(){
 }
 
 function drawDrawer(views){
-  const activeSinkIdx = activeCorridor.sinkIdx ?? 0;
-  const currentSinkView = views[activeSinkIdx];
+  const activeSinkIdx = activeCorridor.sinkIdx;
+  const hasMonitoredSink = activeSinkIdx !== null && views[activeSinkIdx];
+  const currentSinkView = hasMonitoredSink ? views[activeSinkIdx] : null;
   const st = $("status"), sub = $("sub");
-  const cm = Math.round(currentSinkView.d / 10);
   const muniPill = $("muniPill");
 
-  $("gaugeLabel").textContent = currentSinkView.s.name + " water depth";
-  $("gval").textContent = currentSinkView.d + " mm";
-  $("gfill").style.width = Math.min(100, currentSinkView.d / GAUGE_MAX * 100) + "%";
-  $("gfill").style.background = currentSinkView.blocked ? "var(--bad)" : (currentSinkView.d >= VEHICLES.two.mm ? "#f9ab00" : "var(--g)");
-  document.querySelectorAll("#gbar .mk").forEach(e => e.classList.toggle("on", e.dataset.v === sim.vehicle));
+  if (hasMonitoredSink) {
+    const cm = Math.round(currentSinkView.d / 10);
+    $("gaugeLabel").textContent = currentSinkView.s.name + " water depth";
+    $("gval").textContent = currentSinkView.d + " mm";
+    $("gfill").style.width = Math.min(100, currentSinkView.d / GAUGE_MAX * 100) + "%";
+    $("gfill").style.background = currentSinkView.blocked ? "var(--bad)" : (currentSinkView.d >= VEHICLES.two.mm ? "#f59e0b" : "var(--g)");
+    document.querySelectorAll("#gbar .mk").forEach(e => e.classList.toggle("on", e.dataset.v === sim.vehicle));
 
-  // Update Municipal Action status pill in commuter card
-  if (sim.pumped) {
-    muniPill.style.display = "flex";
-    muniPill.className = "municipal-pill ok";
-    muniPill.textContent = "⚡ Municipal Action: Dewatering Completed • Road Restored to Safe Passage";
-  } else if (sim.draining) {
-    muniPill.style.display = "flex";
-    muniPill.className = "municipal-pill active";
-    muniPill.textContent = "🚜 Municipal Action: 40 HP Emergency Dewatering Active at Outfall";
-  } else if (currentSinkView.blocked || sim.scenario === "cloudburst") {
-    muniPill.style.display = "flex";
-    muniPill.className = "municipal-pill";
-    muniPill.textContent = "🚜 Municipal Action: Emergency Pump Squad Dispatched to Outfall Valve";
+    // Update Municipal Action status pill
+    if (sim.pumped) {
+      muniPill.style.display = "flex";
+      muniPill.className = "municipal-pill ok";
+      muniPill.textContent = "⚡ Municipal Action: Dewatering Completed • Road Restored to Safe Passage";
+    } else if (sim.draining) {
+      muniPill.style.display = "flex";
+      muniPill.className = "municipal-pill active";
+      muniPill.textContent = "🚜 Municipal Action: 40 HP Emergency Dewatering Active at Outfall";
+    } else if (currentSinkView.blocked || sim.scenario === "cloudburst") {
+      muniPill.style.display = "flex";
+      muniPill.className = "municipal-pill";
+      muniPill.textContent = "🚜 Municipal Action: Emergency Pump Squad Dispatched to Outfall Valve";
+    } else {
+      muniPill.style.display = "none";
+    }
+
+    // Commuter status
+    if (sim.pumped && !currentSinkView.blocked){
+      st.className = "ok";
+      st.textContent = `Pump Active • ${currentSinkView.s.name} Cleared`;
+      sub.textContent = `Water pumped down to ${currentSinkView.d} mm. Usual route reopened: ${activeCorridor.normalMin} mins.`;
+    } else if (currentSinkView.blocked){
+      st.className = "bad";
+      st.textContent = `⚠️ Rerouted around ${currentSinkView.s.name} • +${activeCorridor.detourMin} mins`;
+      sub.textContent = `Water at ${cm} cm — unsafe for ${VEHICLES[sim.vehicle].label}. Deflecting via ${activeCorridor.bypassVia}.`;
+    } else if (sim.vehicle === "amb" && currentSinkView.d >= VEHICLES.two.mm){
+      st.className = "ok";
+      st.textContent = `Route Clear • ${activeCorridor.normalMin} mins`;
+      sub.textContent = `Water at ${cm} cm — Passable for Heavy/Emergency Ambulances.`;
+    } else {
+      st.className = currentSinkView.d > 0 ? "warn" : "ok";
+      st.textContent = `Route Clear • ${activeCorridor.normalMin} mins`;
+      sub.textContent = currentSinkView.d > 0 ? `Rain in progress — monitoring ${currentSinkView.s.name}.` : (sim.rain > 0 ? "Drainage capacity handling rainfall." : "No flooding detected along your route.");
+    }
   } else {
+    // Custom route with no monitored depression sink
     muniPill.style.display = "none";
-  }
-
-  // Update main commuter drawer status
-  if (sim.pumped && !currentSinkView.blocked){
     st.className = "ok";
-    st.textContent = `Pump Unit Active • ${currentSinkView.s.name} Cleared`;
-    sub.textContent = `Water pumped down to ${currentSinkView.d} mm. Usual route reopened: ${activeCorridor.normalMin} mins.`;
-  } else if (currentSinkView.blocked){
-    st.className = "bad";
-    st.textContent = `⚠️ Rerouted around ${currentSinkView.s.name} • +${activeCorridor.detourMin} mins`;
-    sub.textContent = `Water at ${cm} cm — unsafe for ${VEHICLES[sim.vehicle].label}. Deflecting via ${activeCorridor.bypassVia}.`;
-  } else if (sim.vehicle === "amb" && currentSinkView.d >= VEHICLES.two.mm){
-    st.className = "ok";
-    st.textContent = `Route Clear • ${activeCorridor.normalMin} mins`;
-    sub.textContent = `Water at ${cm} cm — Passable for Heavy/Emergency Ambulances.`;
-  } else {
-    st.className = currentSinkView.d > 0 ? "warn" : "ok";
-    st.textContent = `Route Clear • ${activeCorridor.normalMin} mins`;
-    sub.textContent = currentSinkView.d > 0 ? `Rain in progress — monitoring ${currentSinkView.s.name}.` : (sim.rain > 0 ? "Drainage capacity handling rainfall." : "No flooding detected along your route.");
+    st.textContent = `Custom Route Clear • ${activeCorridor.normalMin} mins`;
+    sub.textContent = "No monitored depression sinks along this corridor. Safe direct passage across Delhi.";
+    $("gaugeLabel").textContent = "Monitored depression basins";
+    $("gval").textContent = "0 mm";
+    $("gfill").style.width = "0%";
+    $("gfill").style.background = "var(--g)";
+    document.querySelectorAll("#gbar .mk").forEach(e => e.classList.toggle("on", e.dataset.v === sim.vehicle));
   }
 
   const clock = sim.rain > 0 ? (sim.t < STORM_MIN ? `Storm replay: minute ${Math.floor(sim.t)} of ${STORM_MIN} • ` : "Storm passed • ") : "";
@@ -1703,12 +1983,17 @@ function buildCards(){
 }
 
 function drawCards(views){
-  const activeSinkIdx = activeCorridor.sinkIdx ?? 0;
-  // Display Cedar Verification Badge in bold green
+  const activeSinkIdx = activeCorridor.sinkIdx;
   const cedarBadge = $("cedarBadge");
   const cedarBadgeText = $("cedarBadgeText");
-  cedarBadge.className = "cedar-badge-banner authorized";
-  cedarBadgeText.textContent = "CEDAR POLICY ENGINE: AUTHORIZED";
+
+  if (activeSinkIdx !== null) {
+    cedarBadge.className = "cedar-badge-banner authorized";
+    cedarBadgeText.textContent = "CEDAR POLICY ENGINE: AUTHORIZED";
+  } else {
+    cedarBadge.className = "cedar-badge-banner standby";
+    cedarBadgeText.textContent = "CEDAR POLICY ENGINE: STANDBY (NO SINK ON ROUTE)";
+  }
 
   views.forEach((v, i) => {
     const r = cardRefs[i];
@@ -1763,11 +2048,11 @@ function draw(){
   drawDrawer(views);
   drawCards(views);
 
-  const activeSinkIdx = activeCorridor.sinkIdx ?? 0;
-  const isRerouted = views[activeSinkIdx].blocked;
+  const activeSinkIdx = activeCorridor.sinkIdx;
+  const isRerouted = (activeSinkIdx !== null && views[activeSinkIdx]) ? views[activeSinkIdx].blocked : false;
 
   // Trigger floating SNS notification banner when cloudburst occurs and threshold exceeded
-  if (isRerouted && !sim.wasRerouted && sim.scenario === "cloudburst") {
+  if (isRerouted && !sim.wasRerouted && sim.scenario === "cloudburst" && activeSinkIdx !== null) {
     showSms(views[activeSinkIdx]);
   }
   sim.wasRerouted = isRerouted;
@@ -1781,13 +2066,13 @@ function showSms(v){
   t.hidden = false;
   setTimeout(() => t.classList.add("show"), 20);
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(hideSms, 9000); // Stays visible comfortably
+  toastTimer = setTimeout(hideSms, 9000);
 }
 function hideSms(){
   const t = $("toast");
   t.classList.remove("show");
   clearTimeout(toastTimer);
-  setTimeout(() => { if (!t.classList.contains("show")) t.hidden = true; }, 400);
+  setTimeout(() => { if (!t.classList.contains("show")) t.hidden = true; }, 300);
 }
 $("toastCloseBtn").addEventListener("click", (e) => {
   e.stopPropagation();
@@ -1818,8 +2103,8 @@ async function run(name){
   Object.assign(sim, {scenario: name, rain: SCENARIOS[name], t: 0, vol: SINKS.map(() => 0), pumped: false, draining: false, api: null, wasRerouted: false});
   hideSms();
   buildCards();
-  if (name === "cloudburst") {
-    setTimeout(() => showSms(SINKS[activeCorridor.sinkIdx ?? 0]), 600);
+  if (name === "cloudburst" && activeCorridor.sinkIdx !== null) {
+    setTimeout(() => showSms(SINKS[activeCorridor.sinkIdx]), 600);
   }
 
   if (sim.rain > 0){
@@ -1842,7 +2127,8 @@ async function run(name){
 
 // ── Closed-loop Pump Discharge & Road Healing ────────────────────────────────
 function dispatchPump(){
-  const sIdx = activeCorridor.sinkIdx ?? 0;
+  const sIdx = activeCorridor.sinkIdx;
+  if (sIdx === null) return;
   const s = SINKS[sIdx];
   const removal = PUMP_M3HR + s.drain - inflow(s, rainNow());
   if (removal <= 0 || sim.draining || sim.pumped) return;
@@ -1869,7 +2155,7 @@ function dispatchPump(){
   })();
 }
 
-// ── Route Switcher Modal Manager ─────────────────────────────────────────────
+// ── Route Switcher & Custom Route Manager ────────────────────────────────────
 function renderCorridorList() {
   const container = $("corridorList");
   container.innerHTML = "";
@@ -1905,11 +2191,133 @@ function selectCorridor(corridor) {
 
 function openRouteModal() {
   renderCorridorList();
+  initCustomForm();
   $("routeModal").classList.add("open");
 }
 function closeRouteModal() {
   $("routeModal").classList.remove("open");
 }
+
+// Initialize Custom Route Selectors
+function initCustomForm() {
+  const oSelect = $("customOrigin"), dSelect = $("customDest");
+  if (oSelect.options.length === 0) {
+    DELHI_HUBS.forEach((h, i) => {
+      oSelect.add(new Option(`${h.name} (${h.zone})`, i));
+      dSelect.add(new Option(`${h.name} (${h.zone})`, i));
+    });
+    oSelect.selectedIndex = 0; // Kashmere Gate
+    dSelect.selectedIndex = 1; // Rohini
+  }
+  updateCustomPreview();
+}
+
+function updateCustomPreview() {
+  const oHub = DELHI_HUBS[$("customOrigin").selectedIndex];
+  const dHub = DELHI_HUBS[$("customDest").selectedIndex];
+  if (!oHub || !dHub) return;
+
+  const preview = buildCustomCorridor(oHub.ll, dHub.ll, oHub.name, dHub.name);
+  if (preview.sinkIdx !== null) {
+    const s = SINKS[preview.sinkIdx];
+    $("detectTitle").textContent = `⚠️ Intersects Monitored Sink: ${s.name} (${s.id})`;
+    $("detectDetail").textContent = `Corridor traverses low-lying basin (${preview.normalMin} mins normal). Automatic detour via ${preview.bypassVia} (+${preview.detourMin} mins) will trigger during cloudburst flooding.`;
+  } else {
+    $("detectTitle").textContent = `✓ Clear Corridor Across Delhi (${preview.normalMin} mins normal)`;
+    $("detectDetail").textContent = `Direct arterial path. Route does not intersect Delhi's monitored depression underpasses.`;
+  }
+}
+
+$("customOrigin").addEventListener("change", updateCustomPreview);
+$("customDest").addEventListener("change", updateCustomPreview);
+
+$("swapPointsBtn").addEventListener("click", () => {
+  const oIdx = $("customOrigin").selectedIndex;
+  $("customOrigin").selectedIndex = $("customDest").selectedIndex;
+  $("customDest").selectedIndex = oIdx;
+  updateCustomPreview();
+});
+
+$("applyCustomBtn").addEventListener("click", () => {
+  const oHub = DELHI_HUBS[$("customOrigin").selectedIndex];
+  const dHub = DELHI_HUBS[$("customDest").selectedIndex];
+  if (oHub.name === dHub.name) {
+    alert("Please select different Origin and Destination locations.");
+    return;
+  }
+  const custom = buildCustomCorridor(oHub.ll, dHub.ll, oHub.name, dHub.name);
+  selectCorridor(custom);
+  closeRouteModal();
+});
+
+// Modal Tabs
+$("tabPredefined").addEventListener("click", () => {
+  $("tabPredefined").classList.add("active");
+  $("tabCustom").classList.remove("active");
+  $("tabPredefined").setAttribute("aria-selected", "true");
+  $("tabCustom").setAttribute("aria-selected", "false");
+  $("predefinedView").style.display = "block";
+  $("customView").style.display = "none";
+});
+
+$("tabCustom").addEventListener("click", () => {
+  $("tabCustom").classList.add("active");
+  $("tabPredefined").classList.remove("active");
+  $("tabCustom").setAttribute("aria-selected", "true");
+  $("tabPredefined").setAttribute("aria-selected", "false");
+  $("customView").style.display = "block";
+  $("predefinedView").style.display = "none";
+});
+
+// ── Interactive Map Click-to-Route ───────────────────────────────────────────
+let mapPickState = null; // 'origin' | 'dest'
+let pickedOriginLL = null;
+let tempPickMarker = null;
+
+function startMapPick() {
+  closeRouteModal();
+  mapPickState = "origin";
+  pickedOriginLL = null;
+  $("mapPickText").textContent = "📍 Step 1: Click anywhere on map to set Origin (Point A)";
+  $("mapPickBanner").style.display = "flex";
+  $("map").style.cursor = "crosshair";
+}
+
+function cancelMapPick() {
+  mapPickState = null;
+  pickedOriginLL = null;
+  if (tempPickMarker) {
+    map.removeLayer(tempPickMarker);
+    tempPickMarker = null;
+  }
+  $("mapPickBanner").style.display = "none";
+  $("map").style.cursor = "";
+}
+
+$("pickMapBtn").addEventListener("click", startMapPick);
+$("cancelPickBtn").addEventListener("click", cancelMapPick);
+
+map.on("click", (e) => {
+  if (!mapPickState) return;
+  const clickLL = [h2(e.latlng.lat), h2(e.latlng.lng)];
+
+  if (mapPickState === "origin") {
+    pickedOriginLL = clickLL;
+    if (tempPickMarker) map.removeLayer(tempPickMarker);
+    tempPickMarker = L.circleMarker(clickLL, {radius: 7, color: "#fff", fillColor: "#2563eb", fillOpacity: 1}).addTo(map);
+    mapPickState = "dest";
+    $("mapPickText").textContent = "🏁 Step 2: Click on map to set Destination (Point B)";
+  } else if (mapPickState === "dest") {
+    const destLL = clickLL;
+    if (tempPickMarker) {
+      map.removeLayer(tempPickMarker);
+      tempPickMarker = null;
+    }
+    const custom = buildCustomCorridor(pickedOriginLL, destLL, "Custom Start", "Custom End");
+    cancelMapPick();
+    selectCorridor(custom);
+  }
+});
 
 // ── UI Wiring & Event Listeners ──────────────────────────────────────────────
 $("pill").addEventListener("click", openRouteModal);
@@ -1925,13 +2333,17 @@ $("routeModal").addEventListener("click", (e) => {
 $("officerBtn").addEventListener("click", () => {
   const isOpen = $("officer").classList.toggle("open");
   $("officerBtn").setAttribute("aria-pressed", isOpen);
+  if (isOpen) {
+    $("water").classList.remove("open");
+    $("waterBtn").setAttribute("aria-pressed", "false");
+  }
 });
 $("closeOfficerBtn").addEventListener("click", () => {
   $("officer").classList.remove("open");
-  $("officerBtn").setAttribute("aria-pressed", false);
+  $("officerBtn").setAttribute("aria-pressed", "false");
 });
 
-// Bottom drawer toggle
+// Commuter card collapse/expand
 const toggleDrawer = () => {
   const isCollapsed = $("drawer").classList.toggle("collapsed");
   $("toggleLabel").textContent = isCollapsed ? "Details ▴" : "Details ▾";
@@ -2105,14 +2517,11 @@ function setWaterOpen(open){
   $("waterBtn").setAttribute("aria-pressed", open);
   if (open){
     $("officer").classList.remove("open");
-    $("officerBtn").setAttribute("aria-pressed", false);
+    $("officerBtn").setAttribute("aria-pressed", "false");
   }
 }
 $("waterBtn").addEventListener("click", () => setWaterOpen(!$("water").classList.contains("open")));
 $("closeWaterBtn").addEventListener("click", () => setWaterOpen(false));
-$("officerBtn").addEventListener("click", () => {
-  if ($("officer").classList.contains("open")) setWaterOpen(false);
-});
 $("wSlider").addEventListener("input", e => renderWater(Number(e.target.value)));
 
 buildWaterCards();
