@@ -227,7 +227,12 @@ GET /hazards/active
 - `console.html` replaced by a Google-Maps-style client (OSM tiles, keyless; single `API_BASE_URL` constant; offline fallback uses ported Phase 1 maths). Fixed a wrong Leaflet SRI hash that stopped the old console from loading Leaflet.
 - Backend config now via `ENVIRONMENT` (LOCAL|AWS), `DYNAMODB_TABLE_NAME`, `EVENT_BUS_NAME`; bus renamed `HydroSentry-EventBus`. See `.env.example`.
 - `GET /hazards/active` filters on `expires_at` and aliases reserved word `status`.
-- `test_e2e.sh` + `DEMO_SCRIPT.md` written; **e2e not yet run end-to-end** (needs Docker, sam, cedar, aws, LOCALSTACK_AUTH_TOKEN).
+- `test_e2e.sh` + `DEMO_SCRIPT.md` written.
+- **E2E first passed 2026-10-11: `RESULT: PASS 70/70`** (macOS arm64, Docker Desktop 29.8.2, SAM CLI 1.168.0, cedar-policy-cli 4.13.0, LocalStack `latest`). Latency through sam local + emulator, 6 calls: min 22 ms, avg 31 ms, max 51 ms (local only, not AWS).
+  - Fixes needed in `test_e2e.sh` (no change to Cedar policy, compute.py, src/app.py or template):
+    1. cedar-policy-cli 4.x prints a blank line before ALLOW/DENY → compare the first non-blank output line (still must match exit code and mock).
+    2. sam reads only `DOCKER_HOST`; Docker Desktop on macOS has no `/var/run/docker.sock` by default → derive `DOCKER_HOST` from the active docker context.
+  - Run: `export PATH="$HOME/.cargo/bin:$PATH"; set -a; . ~/.config/hydrosentry/localstack.env; set +a; sh ./test_e2e.sh`. The LocalStack token lives **outside the repo** (`~/.config/hydrosentry/localstack.env`, chmod 600) so no `.env` exists and the `test_battery.py` credential audit stays green.
 
 ### Phase 6 — Drought & dry-season water supply (in progress, awaiting review)
 

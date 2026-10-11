@@ -174,6 +174,13 @@ if ! docker info >/dev/null 2>&1; then
   printf '%b[preflight]%b docker daemon not reachable\n' "$RED" "$RST" >&2
   exit 2
 fi
+# The docker CLI finds the daemon via its active context, but sam only reads
+# DOCKER_HOST (default /var/run/docker.sock, which Docker Desktop on macOS
+# does not create unless the "default Docker socket" option is enabled).
+if [ -z "${DOCKER_HOST:-}" ] && [ ! -S /var/run/docker.sock ]; then
+  DOCKER_HOST="$(docker context inspect --format '{{.Endpoints.docker.Host}}' 2>/dev/null)" || DOCKER_HOST=""
+  [ -n "$DOCKER_HOST" ] && export DOCKER_HOST
+fi
 
 port_free() {
   python3 -c 'import socket,sys
@@ -364,8 +371,11 @@ while IFS="$(printf '\t')" read -r label ctxfile expect; do
     2) got=DENY;  N_DENY=$((N_DENY + 1)) ;;
     *) fail "B: $label - cedar error rc=$rc" "$out"; continue ;;   # rc 1 is always a failure
   esac
-  # exit code, printed decision, and mock evaluator must all agree
-  case "$out" in
+  # exit code, printed decision, and mock evaluator must all agree.
+  # cedar-policy-cli 4.x prints a blank line before the decision, so compare
+  # against the first non-blank line of output.
+  decision="$(printf '%s\n' "$out" | sed -n '/[^[:space:]]/{p;q;}')"
+  case "$decision" in
     "$got"*) : ;;
     *) fail "B: $label - rc=$rc but output was not '$got'" "$out"; continue ;;
   esac
