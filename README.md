@@ -1,5 +1,7 @@
 # HydroSentry 🌊
 
+**Built with the Registry of Open Data on AWS (Copernicus 30m DEM) • Governed by AWS Cedar Policy Engine • Architected for AWS Serverless Free Tier**
+
 HydroSentry is a real-time urban flood monitoring and automated emergency dispatch system built for vulnerable road underpasses in **Delhi NCT, India**.
 
 During heavy monsoon rains, water rapidly fills low-lying underpasses, trapping motorists. HydroSentry calculates flood risk using topographical elevation data and rainfall rates, automatically authorizing emergency pump dispatch before water reaches the critical **350 mm axle-drowning depth**.
