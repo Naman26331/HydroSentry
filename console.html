@@ -976,6 +976,262 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
   #pill .dot { animation: none; }
   .pulsating-amber .pulsing-dot, .pulsating-green .pulsing-dot { animation: none; }
 }
+
+/* ══ Phase 6: Dry-Season Water Supply (drought view) ══════════════════════ */
+#waterBtn {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: var(--r-pill);
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font: 600 13px var(--font);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  height: 46px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+#waterBtn:hover { border-color: var(--line-hi); background: rgba(255, 255, 255, 0.06); transform: translateY(-1px); }
+#waterBtn[aria-pressed=true] {
+  background: linear-gradient(180deg, #4ee3f5, var(--g));
+  color: var(--g-ink);
+  font-weight: 700;
+  border-color: transparent;
+  box-shadow: var(--g-glow);
+}
+#water {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + var(--safe-bottom));
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: var(--r-panel);
+  border: 1px solid var(--line);
+  padding: 22px 22px 24px;
+  background: linear-gradient(180deg, rgba(20, 30, 49, 0.97) 0%, rgba(9, 14, 25, 0.98) 100%);
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+  box-shadow: var(--top-hi), var(--sh-lg);
+  transform: translateY(calc(100% + 40px));
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1500;
+  max-width: 760px;
+  margin: 0 auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-hi) transparent;
+}
+#water.open { transform: translateY(0); }
+.offline-banner {
+  border-radius: var(--r-inner);
+  padding: 10px 14px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: center;
+  margin-bottom: 16px;
+  color: var(--sub);
+  background: rgba(148, 163, 184, 0.07);
+  border: 1px dashed var(--line-hi);
+}
+.w-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+.day-panel {
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 16px 20px 14px;
+  margin-bottom: 14px;
+  background: var(--surface-solid);
+  box-shadow: var(--top-hi), 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+.day-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.day-big {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-top: 4px;
+}
+.day-meta { text-align: right; font-size: 12.5px; color: var(--sub); line-height: 1.5; }
+.day-meta b { color: var(--ink); font-weight: 700; font-size: 14px; }
+#wSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 10px;
+  margin: 0;
+  border-radius: 5px;
+  background:
+    linear-gradient(90deg, var(--g) 0 var(--fill, 0%), transparent var(--fill, 0%)),
+    rgba(2, 6, 14, 0.75);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(148, 163, 184, 0.12);
+  cursor: pointer;
+}
+#wSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #eafcff;
+  border: 3px solid var(--g);
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.7);
+}
+#wSlider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #eafcff;
+  border: 3px solid var(--g);
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.7);
+}
+.day-ticks {
+  position: relative;
+  height: 16px;
+  margin-top: 10px;
+  font-size: 10.5px;
+  color: var(--label);
+}
+.day-ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.day-ticks span:first-child { transform: none; }
+.day-ticks span:last-child { transform: translateX(-100%); }
+.w-summary {
+  border-radius: var(--r-inner);
+  padding: 11px 14px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.w-summary.ok { background: var(--ok-light); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.35); }
+.w-summary.warn { background: var(--warn-light); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+.w-summary.bad {
+  background: var(--bad-light);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 22px rgba(239, 68, 68, 0.18);
+}
+.w-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.w-area { font-size: 12px; color: var(--sub); margin-top: 3px; }
+.w-pct {
+  text-align: right;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.w-pct small { display: block; margin-top: 6px; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--label); }
+.w-pct.ok { color: var(--ink); }
+.w-pct.warn { color: var(--warn); text-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+.w-pct.bad { color: #ff5c5c; text-shadow: 0 0 24px rgba(239, 68, 68, 0.6); }
+.wbar {
+  position: relative;
+  height: 14px;
+  margin: 26px 0 8px;
+  border-radius: 7px;
+  background:
+    linear-gradient(90deg, rgba(239, 68, 68, 0.16) 0 80%, rgba(245, 158, 11, 0.1) 80% 90%, transparent 90%),
+    rgba(2, 6, 14, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.7);
+}
+.wfill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 6px;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+.wfill.ok { background: var(--ok); box-shadow: 0 0 14px rgba(34, 197, 94, 0.5); }
+.wfill.warn { background: var(--warn); box-shadow: 0 0 14px rgba(245, 158, 11, 0.5); }
+.wfill.bad { background: var(--bad); box-shadow: 0 0 16px rgba(239, 68, 68, 0.65); }
+.wfill::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  height: 40%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0));
+}
+.wline {
+  position: absolute;
+  top: -7px;
+  bottom: -7px;
+  width: 3px;
+  margin-left: -1.5px;
+  left: 80%;
+  background: #ff4d4d;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.9), 0 0 16px rgba(239, 68, 68, 0.6);
+  z-index: 2;
+}
+.wline::after {
+  content: "SAFE LINE 80%";
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+  background: var(--bad);
+  color: #fff;
+  font: 700 9px var(--font);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+}
+.w-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+.w-stat {
+  border-radius: var(--r-inner);
+  padding: 10px 12px;
+  background: rgba(2, 6, 14, 0.35);
+  border: 1px solid var(--line);
+}
+.w-stat .v { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; margin-top: 5px; }
+.w-stat .s { font-size: 11px; color: var(--sub); margin-top: 2px; }
+.w-stat .v.bad { color: #ff5c5c; text-shadow: 0 0 16px rgba(239, 68, 68, 0.5); }
+@media (max-width: 600px) {
+  #waterBtn { padding: 0 12px; height: 40px; }
+  #waterBtn .wb-label { display: none; }
+  #water { left: 8px; right: 8px; bottom: calc(8px + var(--safe-bottom)); border-radius: 20px; padding: 18px 14px 18px; }
+  .day-panel { padding: 14px 14px 12px; }
+  .day-big { font-size: 24px; }
+  .w-pct { font-size: 28px; }
+  .w-stats { gap: 6px; }
+  .w-stat { padding: 8px 9px; }
+  .w-stat .v { font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #water { transition: none; }
+}
 </style>
 </head>
 <body>
@@ -993,6 +1249,10 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
     <button id="officerBtn" aria-pressed="false" aria-controls="officer">
       <span>👷</span>
       <span>Officer View</span>
+    </button>
+    <button id="waterBtn" aria-pressed="false" aria-controls="water" aria-label="Dry-season water supply">
+      <span>💧</span>
+      <span class="wb-label">Water Supply</span>
     </button>
   </div>
 
@@ -1065,6 +1325,39 @@ button:focus-visible, #pill:focus-visible, .corridor-item:focus-visible {
   </div>
 
   <div id="cards"></div>
+</div>
+
+<!-- Phase 6: Dry-Season Water Supply Sheet (drought view, model: drought.py) -->
+<div id="water" role="region" aria-label="Dry-season water supply">
+  <div class="officer-header">
+    <h2>Dry-Season Water Supply</h2>
+    <button class="modal-close" id="closeWaterBtn" aria-label="Close water supply sheet">✕</button>
+  </div>
+  <div class="offline-banner">PREPARED OFFLINE · ILLUSTRATIVE ESTIMATES · NOT LIVE DATA</div>
+
+  <div class="day-panel">
+    <div class="day-head">
+      <div>
+        <div class="w-label">Dry-season day</div>
+        <div class="day-big" id="wDay">Day 1</div>
+      </div>
+      <div class="day-meta">
+        <b id="wDate">1 Mar</b>
+        <div id="wRain">No rain</div>
+      </div>
+    </div>
+    <input type="range" id="wSlider" min="1" max="90" value="1" aria-label="Dry-season day, 1 March to 29 May">
+    <div class="day-ticks">
+      <span style="left:0%">1 Mar</span>
+      <span style="left:34.83%">1 Apr</span>
+      <span style="left:68.54%">1 May</span>
+      <span style="left:100%">29 May</span>
+    </div>
+  </div>
+
+  <div class="w-summary ok" id="wSummary" role="status" aria-live="polite"></div>
+  <div id="wCards"></div>
+  <div class="hint">Model: drought.py · need = people × 135 L/day (CPHEEO norm) · supply = piped + borewells (borewells shrink as the water table falls) · tanker = 10,000 L, enough to lift supply back to the 80% safe line.</div>
 </div>
 
 <!-- Floating Top SNS Civic Dispatch Notification -->
@@ -1661,6 +1954,169 @@ buildGauge();
 renderCorridorList();
 buildCards();
 run("dry");
+
+// ══ Phase 6: Dry-Season Water Supply (port of drought.py) ═══════════════════
+// Seed data mirrors data/delhi_dry_season.json.
+// PREPARED OFFLINE — ILLUSTRATIVE ESTIMATES — NOT LIVE DATA.
+const DRY = {
+  lpcd: 135, safeLine: 0.80, watchLine: 0.90, tankerM3: 10, rainyDayMm: 2.5, days: 90,
+  rain: {9:3.2, 10:6.4, 27:2.0, 45:2.2, 52:3.6, 70:9.4, 71:3.0, 83:5.8},
+  zones: [
+    {id:"DELZON001", name:"Minto Bridge zone",   area:"Central Delhi",    sink:"DELSNK001", pop:38000,
+     piped:4450, bore:600,  start:16.0, full:12.0, limit:35.0, decline:0.012, c:0.92, sy:0.12},
+    {id:"DELZON002", name:"Pul Prahladpur zone", area:"South-East Delhi", sink:"DELSNK002", pop:52000,
+     piped:4000, bore:3600, start:30.0, full:25.0, limit:45.0, decline:0.08,  c:0.90, sy:0.12},
+    {id:"DELZON003", name:"Zakhira zone",        area:"West Delhi",       sink:"DELSNK003", pop:45000,
+     piped:4700, bore:1200, start:14.0, full:10.0, limit:30.0, decline:0.05,  c:0.88, sy:0.12},
+  ],
+};
+const DRY_STATUS = {SAFE:"ok", WATCH:"warn", WATER_TANKER_NEEDED:"bad"};
+const dryRain = d => DRY.rain[d] || 0;
+
+function drySeason(z){
+  const need = z.pop * DRY.lpcd / 1000;
+  let depth = z.start, streak = 0;
+  const out = [];
+  for (let d = 1; d <= DRY.days; d++){
+    const rain = dryRain(d);
+    streak = rain >= DRY.rainyDayMm ? 0 : streak + 1;
+    const frac = Math.max(0, Math.min(1, (z.limit - depth) / (z.limit - z.full)));
+    const supply = z.piped + z.bore * frac;
+    const ratio = supply / need;
+    const status = ratio >= DRY.watchLine ? "SAFE" : (ratio >= DRY.safeLine ? "WATCH" : "WATER_TANKER_NEEDED");
+    const gap = DRY.safeLine * need - supply;
+    out.push({day:d, rain, streak, depth:h2(depth), need, supply, pct:h2(ratio*100), status,
+              tankers: status === "WATER_TANKER_NEEDED" ? Math.ceil(gap / DRY.tankerM3 - 1e-9) : 0});
+    depth = Math.max(0, depth + z.decline - rain/1000 * (1 - z.c) / z.sy);
+  }
+  return out;
+}
+const DRY_RUNS = DRY.zones.map(drySeason);
+{ const p = DRY_RUNS[1][89], m = DRY_RUNS[0][0];
+  console.assert(m.pct === 96.41 && p.depth === 37.09 && p.pct === 77.26 && p.tankers === 20, "drought golden mismatch"); }
+
+const dryDate = d => d <= 31 ? `${d} Mar` : (d <= 61 ? `${d-31} Apr` : `${d-61} May`);
+const fmtM3 = v => Math.round(v).toLocaleString("en-IN");
+
+let dryRefs = [];
+function buildWaterCards(){
+  const box = $("wCards");
+  box.textContent = "";
+  dryRefs = DRY.zones.map(z => {
+    const c = document.createElement("div");
+    c.className = "card";
+    const top = document.createElement("div");
+    top.className = "w-top";
+    const left = document.createElement("div");
+    const b = document.createElement("b");
+    b.textContent = z.name;
+    const area = document.createElement("div");
+    area.className = "w-area";
+    area.textContent = `${z.area} · ${z.pop.toLocaleString("en-IN")} people · near flood sink ${z.sink}`;
+    left.append(b, area);
+    const pct = document.createElement("div");
+    pct.className = "w-pct";
+    const pctNum = document.createElement("span");
+    const pctLab = document.createElement("small");
+    pctLab.textContent = "SUPPLY VS NEED";
+    pct.append(pctNum, pctLab);
+    top.append(left, pct);
+
+    const bar = document.createElement("div");
+    bar.className = "wbar";
+    const fill = document.createElement("div");
+    fill.className = "wfill";
+    const line = document.createElement("div");
+    line.className = "wline";
+    bar.append(fill, line);
+
+    const stats = document.createElement("div");
+    stats.className = "w-stats";
+    const mk = label => {
+      const s = document.createElement("div");
+      s.className = "w-stat";
+      const l = document.createElement("div");
+      l.className = "w-label";
+      l.textContent = label;
+      const v = document.createElement("div");
+      v.className = "v";
+      const sub = document.createElement("div");
+      sub.className = "s";
+      s.append(l, v, sub);
+      stats.append(s);
+      return {v, sub};
+    };
+    const gw = mk("Groundwater depth"), sup = mk("Water today"), tk = mk("Tankers");
+
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    c.append(top, bar, stats, chip);
+    box.append(c);
+    return {pctNum, pct, fill, gw, sup, tk, chip};
+  });
+}
+
+function renderWater(day){
+  const rain = dryRain(day);
+  const streak = DRY_RUNS[0][day-1].streak;
+  $("wDay").textContent = `Day ${day}`;
+  $("wDate").textContent = dryDate(day);
+  $("wRain").textContent = (rain > 0 ? `Rain ${rain} mm` : "No rain") +
+    (streak > 0 ? ` · ${streak} dry day${streak === 1 ? "" : "s"} in a row` : " · rainy day");
+  $("wSlider").style.setProperty("--fill", ((day - 1) / (DRY.days - 1) * 100) + "%");
+
+  const needTankers = [];
+  let watch = 0;
+  DRY_RUNS.forEach((run, i) => {
+    const r = run[day-1], ref = dryRefs[i], z = DRY.zones[i], cls = DRY_STATUS[r.status];
+    const drop = h2(r.depth - z.start);
+    ref.pctNum.textContent = r.pct.toFixed(2) + "%";
+    ref.pct.className = "w-pct " + cls;
+    ref.fill.className = "wfill " + cls;
+    ref.fill.style.width = Math.min(100, r.pct) + "%";
+    ref.gw.v.textContent = r.depth.toFixed(2) + " m";
+    ref.gw.sub.textContent = drop > 0 ? `▼ ${drop.toFixed(2)} m since 1 Mar` : "below ground, 1 Mar";
+    ref.sup.v.textContent = fmtM3(r.supply) + " m³";
+    ref.sup.sub.textContent = `of ${fmtM3(r.need)} m³ needed`;
+    ref.tk.v.textContent = r.tankers > 0 ? `${r.tankers} / day` : "None";
+    ref.tk.v.className = "v" + (r.tankers > 0 ? " bad" : "");
+    ref.tk.sub.textContent = r.tankers > 0 ? `${fmtM3(r.tankers * DRY.tankerM3)} m³ to reach 80%` : "supply above safe line";
+    ref.chip.className = "chip " + {ok:"none", warn:"stby", bad:"go"}[cls];
+    ref.chip.textContent = r.status === "WATER_TANKER_NEEDED" ? "WATER TANKER NEEDED" : r.status;
+    if (r.tankers > 0) needTankers.push(`${z.name} · ${r.tankers} tankers/day`);
+    else if (r.status === "WATCH") watch++;
+  });
+
+  const sum = $("wSummary");
+  if (needTankers.length){
+    sum.className = "w-summary bad";
+    sum.textContent = "⚠️ WATER TANKER NEEDED — " + needTankers.join(" · ");
+  } else if (watch){
+    sum.className = "w-summary warn";
+    sum.textContent = `${watch} zone${watch === 1 ? "" : "s"} on WATCH — supply below 90% of need`;
+  } else {
+    sum.className = "w-summary ok";
+    sum.textContent = "All 3 zones SAFE — supply at least 90% of need";
+  }
+}
+
+function setWaterOpen(open){
+  $("water").classList.toggle("open", open);
+  $("waterBtn").setAttribute("aria-pressed", open);
+  if (open){
+    $("officer").classList.remove("open");
+    $("officerBtn").setAttribute("aria-pressed", false);
+  }
+}
+$("waterBtn").addEventListener("click", () => setWaterOpen(!$("water").classList.contains("open")));
+$("closeWaterBtn").addEventListener("click", () => setWaterOpen(false));
+$("officerBtn").addEventListener("click", () => {
+  if ($("officer").classList.contains("open")) setWaterOpen(false);
+});
+$("wSlider").addEventListener("input", e => renderWater(Number(e.target.value)));
+
+buildWaterCards();
+renderWater(1);
 </script>
 </body>
 </html>

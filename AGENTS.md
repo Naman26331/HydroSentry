@@ -229,6 +229,23 @@ GET /hazards/active
 - `GET /hazards/active` filters on `expires_at` and aliases reserved word `status`.
 - `test_e2e.sh` + `DEMO_SCRIPT.md` written; **e2e not yet run end-to-end** (needs Docker, sam, cedar, aws, LOCALSTACK_AUTH_TOKEN).
 
+### Phase 6 — Drought & dry-season water supply (in progress, awaiting review)
+
+Covers the drought half of the "Heat and Water" track (floods = too much water, drought = too little).
+
+| # | File | Description |
+|---|---|---|
+| 1 | `drought.py` | Day-by-day dry-season engine + 8 built-in tests (`python3 drought.py`) |
+| 2 | `data/delhi_dry_season.json` | Seed: 3 zones linked to DELSNK001-003 + 90-day rainfall (1 Mar - 29 May) |
+| 3 | `console.html` | "Water Supply" button + dry-season sheet (JS port of drought.py, additions only) |
+
+- **Seed data is PREPARED OFFLINE, ILLUSTRATIVE, NOT LIVE** — stated in the JSON `_notice`, drought.py docstring and the console banner. JSON (not YAML) so stdlib-only tests can check code == data.
+- Model: need = population x 135 L/day (CPHEEO); supply = piped + borewell x clamp((pump_limit - depth)/(pump_limit - full_yield_depth)); water table falls `gw_decline_m_day` and rises `rain/1000 x (1 - C)/specific_yield` (C shared with delhi_sinks.yaml, test-enforced).
+- Status: SAFE >= 90%, WATCH >= 80%, WATER_TANKER_NEEDED < 80%; tankers = ceil(gap to 80% / 10 m3). Dry streak uses IMD rainy day (>= 2.5 mm).
+- Decimal + ROUND_HALF_UP like compute.py; deterministic. Console port matches Python on all 270 zone-days (verified); load-time golden `console.assert`.
+- Tanker alert is advisory only — **Cedar policy, compute.py, src/app.py, template.yaml untouched**. No backend/API for drought yet.
+- Known pre-existing issue (not Phase 6): `test_battery.py` Edge Case D expects depth > 450 mm, but the flood model caps at 350 mm, so it always fails.
+
 ---
 
 ## Seed Data Reference
@@ -266,6 +283,7 @@ GET /hazards/active
 HydroSentry/
 ├── AGENTS.md                         ← This file (project memory)
 ├── compute.py                        ← Phase 1: Hazard compute + Cedar mock
+├── drought.py                        ← Phase 6: Dry-season water supply engine
 ├── template.yaml                     ← Phase 2: SAM infrastructure template
 ├── env.json                          ← Phase 2: Local env vars for sam local
 ├── console.html                      ← Phase 3: Operations console (single file)
@@ -275,7 +293,8 @@ HydroSentry/
 ├── schemas/
 │   └── sink.schema.json              ← JSON Schema (Draft 2020-12)
 ├── data/
-│   └── delhi_sinks.yaml              ← Seed dataset (3 Delhi sinks)
+│   ├── delhi_sinks.yaml              ← Seed dataset (3 Delhi sinks)
+│   └── delhi_dry_season.json         ← Phase 6 seed (offline, illustrative)
 └── policies/
     ├── hydrosentry.cedarschema       ← Cedar entity type definitions
     └── hydrosentry.cedar             ← Cedar authorization policy

@@ -1,0 +1,72 @@
+{
+  "_notice": "PREPARED OFFLINE - ILLUSTRATIVE ESTIMATES - NOT LIVE DATA. Believable Delhi pre-monsoon dry-season values for demonstrating the drought model; not official measurements. Mirrored in drought.py (checked by its tests).",
+  "season": {
+    "label": "Delhi pre-monsoon dry season, day 1 = 1 Mar, day 90 = 29 May",
+    "days": 90,
+    "demand_lpcd": 135,
+    "demand_note": "CPHEEO planning norm for Indian cities with piped sewerage",
+    "safe_line_fraction": 0.8,
+    "watch_line_fraction": 0.9,
+    "tanker_capacity_m3": 10,
+    "rainy_day_threshold_mm": 2.5,
+    "units": "metres, cubic metres per day, mm of rain"
+  },
+  "rainfall_mm": [
+    0, 0, 0, 0, 0, 0, 0, 0, 3.2, 6.4,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 2.0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 2.2, 0, 0, 0, 0, 0,
+    0, 3.6, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 9.4,
+    3.0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 5.8, 0, 0, 0, 0, 0, 0, 0
+  ],
+  "zones": [
+    {
+      "zone_id": "DELZON001",
+      "name": "Minto Bridge zone",
+      "linked_sink_id": "DELSNK001",
+      "area": "Central Delhi",
+      "population": 38000,
+      "piped_supply_m3_day": 4450,
+      "borewell_capacity_m3_day": 600,
+      "gw_start_depth_m": 16.0,
+      "gw_full_yield_depth_m": 12.0,
+      "gw_pump_limit_m": 35.0,
+      "gw_decline_m_day": 0.012,
+      "runoff_coeff": 0.92,
+      "specific_yield": 0.12
+    },
+    {
+      "zone_id": "DELZON002",
+      "name": "Pul Prahladpur zone",
+      "linked_sink_id": "DELSNK002",
+      "area": "South-East Delhi",
+      "population": 52000,
+      "piped_supply_m3_day": 4000,
+      "borewell_capacity_m3_day": 3600,
+      "gw_start_depth_m": 30.0,
+      "gw_full_yield_depth_m": 25.0,
+      "gw_pump_limit_m": 45.0,
+      "gw_decline_m_day": 0.08,
+      "runoff_coeff": 0.9,
+      "specific_yield": 0.12
+    },
+    {
+      "zone_id": "DELZON003",
+      "name": "Zakhira zone",
+      "linked_sink_id": "DELSNK003",
+      "area": "West Delhi",
+      "population": 45000,
+      "piped_supply_m3_day": 4700,
+      "borewell_capacity_m3_day": 1200,
+      "gw_start_depth_m": 14.0,
+      "gw_full_yield_depth_m": 10.0,
+      "gw_pump_limit_m": 30.0,
+      "gw_decline_m_day": 0.05,
+      "runoff_coeff": 0.88,
+      "specific_yield": 0.12
+    }
+  ]
+}
